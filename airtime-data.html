@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        (function(){
+            try {
+                const u = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+                if (!u) {
+                    localStorage.setItem('sb_show_login', '1');
+                    window.location.href = 'simplebanking.html#features';
+                }
+            } catch(e){}
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airtime & Data - SimpleBank</title>
+    <link rel="stylesheet" href="simplebanking.css">
+    <link rel="shortcut icon" href="./images/favicon-32x32.png" type="image/x-icon">
+    <style>
+        /* Local styles for Airtime & Data page */
+        main.airtime-data {
+            padding: 1.25rem;
+            max-width: 720px;
+            margin: 1.5rem auto;
+        }
+        .card {
+            background: #fff;
+            padding: 1.25rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(16,185,129,0.06);
+            margin-bottom: 1rem;
+        }
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .tab {
+            flex: 1;
+            padding: 0.75rem;
+            text-align: center;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .tab.active {
+            background: #10b981;
+            color: white;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.65rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .data-bundles {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+        .bundle-option {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 0.75rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .bundle-option:hover {
+            border-color: #10b981;
+        }
+        .bundle-option.selected {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+        .bundle-size {
+            font-weight: 600;
+            color: #10b981;
+        }
+        .bundle-validity {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        .bundle-price {
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+        /* Confirmation modal */
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+        }
+        .modal-inner {
+            background: #fff;
+            padding: 1.25rem;
+            border-radius: 12px;
+            width: 92%;
+            max-width: 420px;
+        }
+        .modal-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .modal-actions button {
+            flex: 1;
+        }
+        @media (max-width: 480px) {
+            main.airtime-data {
+                padding: 1rem;
+                margin: 1rem;
+            }
+            .tabs {
+                flex-direction: column;
+            }
+            .data-bundles {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">TBanking</div>
+        <nav>
+            <a href="simplebanking.html#features">Home</a>
+        </nav>
+    </header>
+
+    <main class="airtime-data">
+        <h1>Airtime & Data</h1>
+        <p style="color:#6b7280;margin-bottom:1.5rem;">Top up your phone or buy data bundles anytime.</p>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="airtime">Airtime Top-up</button>
+            <button class="tab" data-tab="data">Data Bundle</button>
+        </div>
+
+        <!-- Airtime Form -->
+        <form id="airtimeForm" class="card">
+            <div class="form-group">
+                <label for="airtime-phone">Phone Number</label>
+                <input type="tel" id="airtime-phone" placeholder="Enter phone number" required>
+            </div>
+            <div class="form-group">
+                <label for="airtime-amount">Amount</label>
+                <input type="number" id="airtime-amount" min="50" step="10" placeholder="Enter amount" required>
+            </div>
+            <div class="form-group">
+                <label for="data-provider">Network Provider</label>
+                <select id="data-provider" required>
+                    <option value="">Select provider</option>
+                    <option value="mtn">MTN</option>
+                    <option value="airtel">Airtel</option>
+                    <option value="glo">Glo</option>
+                    <option value="9mobile">9Mobile</option>
+                </select>
+            </div>
+            <button type="button" class="cta" style="width:100%" id="buyAirtimeBtn">Buy Airtime</button>
+        </form>
+
+        <!-- Data Bundle Form -->
+        <form id="dataForm" class="card" style="display:none">
+            <div class="form-group">
+                <label for="data-phone">Phone Number</label>
+                <input type="tel" id="data-phone" placeholder="Enter phone number" required>
+            </div>
+            <div class="form-group">
+                <label for="data-provider">Network Provider</label>
+                <select id="data-provider" required>
+                    <option value="">Select provider</option>
+                    <option value="mtn">MTN</option>
+                    <option value="airtel">Airtel</option>
+                    <option value="glo">Glo</option>
+                    <option value="9mobile">9Mobile</option>
+                </select>
+            </div>
+            <div class="data-bundles" id="dataBundles">
+                <div class="bundle-option" data-price="100" data-size="500MB">
+                    <div class="bundle-size">500MB</div>
+                    <div class="bundle-validity">Valid for 1 day</div>
+                    <div class="bundle-price">₦100</div>
+                </div>
+                <div class="bundle-option" data-price="200" data-size="1GB">
+                    <div class="bundle-size">1GB</div>
+                    <div class="bundle-validity">Valid for 1 day</div>
+                    <div class="bundle-price">₦200</div>
+                </div>
+                <div class="bundle-option" data-price="1000" data-size="5GB">
+                    <div class="bundle-size">5GB</div>
+                    <div class="bundle-validity">Valid for 7 days</div>
+                    <div class="bundle-price">₦1,000</div>
+                </div>
+                <div class="bundle-option" data-price="1500" data-size="10GB">
+                    <div class="bundle-size">10GB</div>
+                    <div class="bundle-validity">Valid for 30 days</div>
+                    <div class="bundle-price">₦1,500</div>
+                </div>
+            </div>
+            <button type="button" class="cta" style="width:100%" id="buyDataBtn">Buy Data Bundle</button>
+        </form>
+    </main>
+
+    <!-- Confirmation Modal -->
+    <div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-inner">
+            <h2 id="confirmTitle">Confirm Purchase</h2>
+            <div id="confirmBody"></div>
+            <div class="modal-actions">
+                <button id="confirmPurchase" class="cta">Confirm</button>
+                <button id="cancelPurchase" style="background:#fff;border:1px solid #e5e7eb;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab');
+        const forms = {
+            airtime: document.getElementById('airtimeForm'),
+            data: document.getElementById('dataForm')
+        };
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                // Show correct form
+                forms.airtime.style.display = tabName === 'airtime' ? 'block' : 'none';
+                forms.data.style.display = tabName === 'data' ? 'block' : 'none';
+            });
+        });
+
+        // Data bundle selection
+        const bundles = document.querySelectorAll('.bundle-option');
+        let selectedBundle = null;
+
+        bundles.forEach(bundle => {
+            bundle.addEventListener('click', () => {
+                bundles.forEach(b => b.classList.remove('selected'));
+                bundle.classList.add('selected');
+                selectedBundle = bundle;
+            });
+        });
+
+        // Modal handling
+        const modal = document.getElementById('confirmModal');
+        const confirmBody = document.getElementById('confirmBody');
+        const confirmTitle = document.getElementById('confirmTitle');
+        const confirmBtn = document.getElementById('confirmPurchase');
+        const cancelBtn = document.getElementById('cancelPurchase');
+
+        function showModal(title, content) {
+            confirmTitle.textContent = title;
+            confirmBody.innerHTML = content;
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function hideModal() {
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        // Airtime purchase
+        document.getElementById('buyAirtimeBtn').addEventListener('click', () => {
+            const phone = document.getElementById('airtime-phone').value.trim();
+            const amount = parseFloat(document.getElementById('airtime-amount').value);
+            
+            if (!phone || !amount || amount < 50) {
+                showModal('Error', '<p style="color:#b91c1c">Please enter a valid phone number and amount (minimum ₦50)</p>');
+                return;
+            }
+
+            showModal('Confirm Airtime Purchase', `
+                <div style="color:#6b7280">
+                    <p>Phone Number: <strong>${phone}</strong></p>
+                    <p>Amount: <strong>₦${amount.toFixed(2)}</strong></p>
+                </div>
+            `);
+        });
+
+        // Data bundle purchase
+        document.getElementById('buyDataBtn').addEventListener('click', () => {
+            const phone = document.getElementById('data-phone').value.trim();
+            const provider = document.getElementById('data-provider').value;
+            
+            if (!phone || !provider || !selectedBundle) {
+                showModal('Error', '<p style="color:#b91c1c">Please enter phone number, select provider and choose a data bundle</p>');
+                return;
+            }
+
+            const bundleSize = selectedBundle.dataset.size;
+            const bundlePrice = selectedBundle.dataset.price;
+
+            showModal('Confirm Data Purchase', `
+                <div style="color:#6b7280">
+                    <p>Phone Number: <strong>${phone}</strong></p>
+                    <p>Network: <strong>${provider.toUpperCase()}</strong></p>
+                    <p>Bundle: <strong>${bundleSize}</strong></p>
+                    <p>Amount: <strong>₦${bundlePrice}</strong></p>
+                </div>
+            `);
+        });
+
+        // Purchase confirmation
+        confirmBtn.addEventListener('click', () => {
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Processing...';
+            
+            setTimeout(() => {
+                hideModal();
+                // Show success message
+                const success = document.createElement('div');
+                success.className = 'card';
+                success.style.marginTop = '1rem';
+                success.innerHTML = `
+                    <h3 style="color:#10b981">Purchase Successful!</h3>
+                    <p style="color:#6b7280;margin-top:0.5rem;">Your transaction has been completed.</p>
+                `;
+                document.querySelector('main.airtime-data').appendChild(success);
+                
+                // Reset forms
+                forms.airtime.reset();
+                forms.data.reset();
+                bundles.forEach(b => b.classList.remove('selected'));
+                selectedBundle = null;
+                
+                // Reset button
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Confirm';
+            }, 1500);
+        });
+
+        // Cancel purchase
+        cancelBtn.addEventListener('click', hideModal);
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) hideModal();
+        });
+    </script>
+</body>
+</html>

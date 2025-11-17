@@ -1,0 +1,189 @@
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    background: #f7f8fa;
+    color: #222;
+}
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 3rem;
+    background: linear-gradient(90deg, #6ee7b7 0%, #3b82f6 100%);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+/* Center the account number in the header. On wide screens we absolutely center it
+   so it sits between the logo and nav. On small screens it becomes static and
+   stacks with the header content for better responsiveness. */
+#headerAccount {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 600;
+    color: #fff;
+    background: rgba(255,255,255,0.06);
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    pointer-events: none; /* not interactive here; actions live in nav/wallet */
+}
+.logo {
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 1rem;
+    font-weight: 500;
+}
+nav button {
+    background: #fff;
+    color: #3b82f6;
+    border: none;
+    border-radius: 20px;
+    padding: 0.5rem 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 1rem;
+}
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3rem;
+    background: #e0f2fe;
+}
+.hero-content {
+    max-width: 500px;
+}
+.hero h1 {
+    font-size: 2.5rem;
+    color: #10b981;
+}
+.hero p {
+    font-size: 1.2rem;
+    margin: 1rem 0 2rem 0;
+}
+.cta {
+    background: linear-gradient(90deg, #10b981 0%, #3b82f6 100%);
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(59,130,246,0.1);
+}
+.hero-img {
+    width: 350px;
+    border-radius: 2rem;
+    box-shadow: 0 4px 24px rgba(16,185,129,0.15);
+}
+.features {
+    padding: 3rem 1rem;
+    background: #fff;
+    text-align: center;
+}
+.feature-list {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+.feature {
+    background: #f0fdf4;
+    border-radius: 1.5rem;
+    padding: 2rem 1.5rem;
+    width: 220px;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.07);
+}
+.feature img {
+    width: 48px;
+    margin-bottom: 1rem;
+}
+.download {
+    padding: 2rem 1rem;
+    background: #e0f2fe;
+    text-align: center;
+}
+footer {
+    background: #3b82f6;
+    color: #fff;
+    text-align: center;
+    padding: 1.5rem 0;
+    margin-top: 2rem;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 200;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.3);
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 16px rgba(59,130,246,0.15);
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: relative;
+}
+.modal-content input {
+    margin: 0.5rem 0;
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    font-size: 1rem;
+}
+.close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    color: #3b82f6;
+    cursor: pointer;
+}
+@media (max-width: 900px) {
+    .hero {
+        flex-direction: column;
+        text-align: center;
+    }
+    .hero-img {
+        margin-top: 2rem;
+        width: 90vw;
+        max-width: 350px;
+    }
+    .feature-list {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    /* On smaller screens, let the header stack and make the account element flow
+       with the document so it doesn't overlap other header controls. */
+    header {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 1.25rem;
+    }
+    #headerAccount {
+        position: static;
+        transform: none;
+        pointer-events: auto;
+    }
+}

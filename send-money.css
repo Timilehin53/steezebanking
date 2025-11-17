@@ -1,0 +1,36 @@
+/* External styles for send-money.html */
+/* Confirmation modal */
+.confirm-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+}
+.confirm-modal .modal-inner {
+    background: #fff;
+    padding: 1.25rem;
+    border-radius: 12px;
+    width: 92%;
+    max-width: 420px;
+}
+.modal-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+.modal-actions button {
+    flex: 1;
+}
+.success-message {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(16,185,129,0.06);
+    margin-top: 1rem;
+}
+.error-text {
+    color: #b91c1c;
+}

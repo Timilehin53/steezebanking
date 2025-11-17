@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function(){
+      try {
+        const u = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+        if (!u) {
+          localStorage.setItem('sb_show_login', '1');
+          window.location.href = 'simplebanking.html#features';
+        }
+      } catch(e){}
+    })();
+  </script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pay Bills - SimpleBank</title>
+  <link rel="stylesheet" href="simplebanking.css">
+  <style>
+    /* Local responsive overrides for the Pay Bills page */
+    main.paybills {
+      padding: 1.25rem;
+      max-width: 720px;
+      margin: 1.5rem auto;
+    }
+    .card {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(16,185,129,0.06);
+    }
+    .form-row { display:flex; gap:0.75rem; align-items:center; }
+    .form-row .col { flex:1; }
+    label { font-weight:600; font-size:0.95rem; display:block; margin-bottom:0.35rem; }
+    input, select { width:100%; padding:0.65rem; border-radius:8px; border:1px solid #e5e7eb; }
+    .muted { color:#6b7280; font-size:0.95rem; }
+    .actions { margin-top:1rem; display:flex; gap:0.75rem; }
+    .actions .btn { flex:1; }
+    @media (max-width:600px) {
+      .form-row { flex-direction:column; }
+      main.paybills { padding:1rem; margin:1rem; }
+    }
+    
+    .confirm-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); align-items:center; justify-content:center; z-index:300; }
+    .confirm-modal .modal-inner { background:#fff; padding:1.25rem; border-radius:12px; width:92%; max-width:420px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">TBanking</div>
+    <nav>
+      <a href="simplebanking.html#features">Home</a>
+    </nav>
+  </header>
+
+  <main class="paybills">
+    <h1>Pay Bills</h1>
+    <p class="muted">Settle your utility bills and subscriptions in seconds.</p>
+
+    <section class="card" aria-labelledby="pay-bills-form">
+      <form id="payBillsForm">
+        <div class="form-row">
+          <div class="col">
+            <label for="biller">Select Biller</label>
+            <select id="biller" required>
+              <option value="">Choose biller</option>
+              <option value="electric">Electricity</option>
+              <option value="water">Water</option>
+              <option value="internet">Internet</option>
+              <option value="tv">TV Subscription</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top:0.75rem;">
+          <div class="col">
+            <label for="account">Account / Meter Number</label>
+            <input id="account" type="text" inputmode="numeric" placeholder="Enter account or meter number" required>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top:0.75rem;">
+          <div class="col">
+            <label for="amount">Amount</label>
+            <input id="amount" type="number" min="1" step="0.01" placeholder="$0.00" required>
+          </div>
+          <div style="width:140px;display:flex;align-items:end;">
+            <div class="muted">Balance: <strong id="balance">$1,250.00</strong></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="cta btn" id="reviewBtn">Review & Pay</button>
+          <button type="reset" class="btn" style="background:#fff;border:1px solid #e5e7eb;">Reset</button>
+        </div>
+      </form>
+    </section>
+
+  </main>
+
+  <div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-inner">
+      <h2 id="confirmTitle">Confirm Payment</h2>
+      <div id="confirmBody"></div>
+      <div style="margin-top:1rem; display:flex; gap:0.5rem;">
+        <button id="confirmPay" class="cta" style="flex:1;">Pay Now</button>
+        <button id="cancelPay" style="flex:1; background:#fff; border:1px solid #e5e7eb;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Basic client-side validation and confirmation
+    const form = document.getElementById('payBillsForm');
+    const reviewBtn = document.getElementById('reviewBtn');
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmBody = document.getElementById('confirmBody');
+    const confirmPay = document.getElementById('confirmPay');
+    const cancelPay = document.getElementById('cancelPay');
+
+    function showModal(contentHtml) {
+      confirmBody.innerHTML = contentHtml;
+      confirmModal.style.display = 'flex';
+      confirmModal.setAttribute('aria-hidden', 'false');
+    }
+    function hideModal() {
+      confirmModal.style.display = 'none';
+      confirmModal.setAttribute('aria-hidden', 'true');
+    }
+
+    reviewBtn.addEventListener('click', () => {
+      // simple validation
+      const biller = document.getElementById('biller').value;
+      const account = document.getElementById('account').value.trim();
+      const amount = parseFloat(document.getElementById('amount').value);
+      const errors = [];
+      if (!biller) errors.push('Please choose a biller.');
+      if (!account) errors.push('Please enter the account or meter number.');
+      if (!amount || amount <= 0) errors.push('Please enter a valid amount.');
+      if (errors.length) {
+        showModal('<p style="color:#b91c1c;">' + errors.join('<br>') + '</p>');
+        return;
+      }
+      // show confirmation
+      const html = `
+        <p class="muted">Biller: <strong>${biller}</strong></p>
+        <p class="muted">Account: <strong>${account}</strong></p>
+        <p class="muted">Amount: <strong>$${amount.toFixed(2)}</strong></p>
+      `;
+      showModal(html);
+    });
+
+    cancelPay.addEventListener('click', hideModal);
+
+    confirmPay.addEventListener('click', () => {
+      // fake processing delay then success
+      confirmPay.disabled = true;
+      confirmPay.textContent = 'Processing...';
+      setTimeout(() => {
+        hideModal();
+        // show a quick success message on the page
+        const success = document.createElement('div');
+        success.className = 'card';
+        success.style.marginTop = '1rem';
+        success.innerHTML = '<h3>Payment Successful</h3><p class="muted">Your bill payment was processed.</p>';
+        document.querySelector('main.paybills').appendChild(success);
+        confirmPay.disabled = false;
+        confirmPay.textContent = 'Pay Now';
+        form.reset();
+      }, 1100);
+    });
+
+    // hide modal when clicking outside
+    confirmModal.addEventListener('click', (e) => {
+      if (e.target === confirmModal) hideModal();
+    });
+  </script>
+
+</body>
+</html>

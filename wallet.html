@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        (function(){
+            try {
+                const u = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+                if (!u) {
+                    localStorage.setItem('sb_show_login', '1');
+                    window.location.href = 'simple_bank.html#features';
+                }
+            } catch(e){}
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet - SimpleBank</title>
+    <link rel="stylesheet" href="simplebanking.css">
+    <link rel="shortcut icon" href="./images/favicon-32x32.png" type="image/x-icon">
+    <style>
+        /* Local styles for Wallet page */
+        main.wallet {
+            padding: 1.25rem;
+            max-width: 1200px;
+            margin: 1.5rem auto;
+        }
+        .grid {
+            display: grid;
+            gap: 1.25rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        .card {
+            background: #fff;
+            padding: 1.25rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(16,185,129,0.06);
+        }
+        .balance-card {
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            color: white;
+        }
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+        .balance-date {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .transactions {
+            margin-top: 2rem;
+        }
+        .transaction-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .filter-btn.active {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        .transaction-item:hover {
+            transform: translateX(4px);
+        }
+        .transaction-info {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background: #e0f2fe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        .transaction-details h4 {
+            margin: 0;
+            font-size: 1rem;
+        }
+        .transaction-details p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        .transaction-amount {
+            font-weight: 600;
+        }
+        .amount-positive {
+            color: #10b981;
+        }
+        .amount-negative {
+            color: #ef4444;
+        }
+        .spending-chart {
+            height: 200px;
+            margin-top: 1rem;
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+            padding-bottom: 1.5rem;
+            position: relative;
+        }
+        .chart-bar {
+            flex: 1;
+            background: #10b981;
+            opacity: 0.8;
+            transition: height 0.3s;
+            position: relative;
+        }
+        .chart-bar::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        .chart-legend {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+        @media (max-width: 768px) {
+            main.wallet {
+                padding: 1rem;
+                margin: 1rem;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .transaction-filters {
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+                flex-wrap: nowrap;
+            }
+            .filter-btn {
+                flex-shrink: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">TBanking</div>
+        <nav>
+            <a href="simplebanking.html#features">Home</a>
+        </nav>
+    </header>
+
+    <main class="wallet">
+        <div class="grid">
+            <!-- Balance Overview -->
+            <div class="card balance-card">
+                <h3>Total Balance</h3>
+                <div id="walletUserName" style="font-weight:600;opacity:0.95"></div>
+                <div class="balance-amount">₦245,678.90</div>
+                <div style="display:flex;gap:0.6rem;align-items:center;margin-top:.6rem;">
+                    <div id="walletAccount" style="font-size:0.95rem;opacity:0.95"></div>
+                    <button id="copyAccount" style="background:rgba(255,255,255,0.15);border:none;padding:0.45rem 0.6rem;border-radius:8px;color:white;cursor:pointer">Copy</button>
+                </div>
+                <div class="balance-date">Last updated: Today, 2:45 PM</div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <h3>Quick Actions</h3>
+                <div style="display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap;">
+                    <button class="cta" style="flex:1">Add Money</button>
+                    <button class="cta" style="flex:1;background:#fff;border:1px solid #e5e7eb;color:#374151">Withdraw</button>
+                </div>
+            </div>
+
+            <!-- Spending Analytics -->
+            <div class="card">
+                <h3>Spending by Category</h3>
+                <div class="spending-chart">
+                    <div class="chart-bar" style="height:80%" data-label="Bills"></div>
+                    <div class="chart-bar" style="height:60%" data-label="Transfer"></div>
+                    <div class="chart-bar" style="height:40%" data-label="Airtime"></div>
+                    <div class="chart-bar" style="height:30%" data-label="Data"></div>
+                    <div class="chart-bar" style="height:20%" data-label="Others"></div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background:#10b981"></div>
+                        <span>Bills (40%)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background:#10b981;opacity:0.8"></div>
+                        <span>Transfer (30%)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background:#10b981;opacity:0.6"></div>
+                        <span>Others (30%)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction History -->
+        <section class="transactions">
+            <h3>Transaction History</h3>
+            
+            <div class="transaction-filters">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">Today</button>
+                <button class="filter-btn">Yesterday</button>
+                <button class="filter-btn">This Week</button>
+                <button class="filter-btn">This Month</button>
+            </div>
+
+            <div class="transaction-list">
+                <!-- Transaction items will be dynamically populated -->
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Sample transaction data
+        const transactions = [
+            {
+                type: 'credit',
+                title: 'Money Received',
+                description: 'From John Doe',
+                amount: 15000,
+                date: '2025-11-05T14:30:00',
+                icon: '↓'
+            },
+            {
+                type: 'debit',
+                title: 'Airtime Purchase',
+                description: 'MTN - 08012345678',
+                amount: 1000,
+                date: '2025-11-05T12:15:00',
+                icon: '📱'
+            },
+            {
+                type: 'debit',
+                title: 'Electricity Bill',
+                description: 'IKEDC - Monthly',
+                amount: 25000,
+                date: '2025-11-04T16:45:00',
+                icon: '⚡'
+            },
+            {
+                type: 'debit',
+                title: 'Money Sent',
+                description: 'To Sarah Smith',
+                amount: 50000,
+                date: '2025-11-04T10:20:00',
+                icon: '↑'
+            }
+        ];
+
+        // Populate transaction list
+        function renderTransactions(txns) {
+            const list = document.querySelector('.transaction-list');
+            list.innerHTML = txns.map(t => `
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-icon">${t.icon}</div>
+                        <div class="transaction-details">
+                            <h4>${t.title}</h4>
+                            <p>${t.description}</p>
+                        </div>
+                    </div>
+                    <div class="transaction-amount ${t.type === 'credit' ? 'amount-positive' : 'amount-negative'}">
+                        ${t.type === 'credit' ? '+' : '-'}₦${t.amount.toLocaleString()}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize with all transactions
+        renderTransactions(transactions);
+
+        // Filter buttons
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update active state
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Filter transactions (simple demo - could be expanded)
+                let filtered = [...transactions];
+                const filter = btn.textContent.toLowerCase();
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+
+                if (filter === 'today') {
+                    filtered = transactions.filter(t => new Date(t.date) >= today);
+                } else if (filter === 'yesterday') {
+                    filtered = transactions.filter(t => {
+                        const date = new Date(t.date);
+                        return date >= yesterday && date < today;
+                    });
+                }
+
+                renderTransactions(filtered);
+            });
+        });
+
+        // Quick action buttons
+        document.querySelectorAll('.cta').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Simulate action (could be expanded)
+                const action = btn.textContent;
+                alert(`${action} feature coming soon!`);
+            });
+        });
+
+        // show current user info and account number
+        (function showCurrentUser(){
+            try {
+                const current = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+                if (!current) return;
+                const nameEl = document.getElementById('walletUserName');
+                const acctEl = document.getElementById('walletAccount');
+                const copyBtn = document.getElementById('copyAccount');
+                if (nameEl) nameEl.textContent = `Hello, ${current.name}`;
+                if (acctEl) acctEl.textContent = `Acct: ${current.accountNumber ? current.accountNumber : ''}`;
+                if (copyBtn) {
+                    copyBtn.addEventListener('click', async () => {
+                        if (!current.accountNumber) return;
+                        try {
+                            await navigator.clipboard.writeText(current.accountNumber);
+                            const original = copyBtn.textContent;
+                            copyBtn.textContent = 'Copied';
+                            setTimeout(() => copyBtn.textContent = original, 1200);
+                        } catch(e) {
+                            alert('Copy not supported');
+                        }
+                    });
+                }
+            } catch(e){}
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TBanking</title>
+    <link rel="stylesheet" href="simplebanking.css">
+    
+</head><link rel="shortcut icon" href="./images/favicon-32x32.png" type="image/x-icon">
+<body>
+    <header>
+        <div class="logo">TBanking</div>
+        <div id="headerAccount"></div>
+        <nav>
+            <a href="#about">About</a>
+            <a href="#features">Features</a>
+            <!-- <a href="#download">Download</a> -->
+            <a href="#contact">Contact</a>
+            <button id="loginBtn">Login</button>
+        </nav>
+    </header>
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Banking Made Simple</h1>
+            <p>Send money, pay bills, buy airtime, and manage your wallet with ease.</p>
+            <button id="signupBtn" class="cta">Signup</button>
+        </div>
+        <img src="images/image-mockups.png" alt="App Mockup" the class="hero-img">
+    </section>
+    <section id="about" class="about" style="padding:2rem;background:#fff;">
+        <h2>About TBanking</h2>
+        <p style="max-width:760px; color:#374151;">TBanking is a lightweight banking front-end prototype inspired by modern mobile money apps. It demonstrates sending money, paying bills, topping up airtime/data, and a simple wallet dashboard — all designed to be responsive and accessible.</p>
+    </section>
+    <section id="features" class="features">
+        <h2>Features</h2>
+        <div class="feature-list">
+            <div class="feature" id="sendMoneyFeature" role="button" tabindex="0" aria-label="Send Money - Transfer funds instantly to anyone, anywhere">
+                <img src="images/icon-online.svg" alt="Send Money">
+                <h3>Send Money</h3>
+                <p>Transfer funds instantly to anyone, anywhere.</p>
+            </div>
+            <div class="feature" id="payBillsFeature" role="button" tabindex="0" aria-label="Pay Bills - Settle your utility bills and subscriptions in seconds">
+                <img src="images/icon-budgeting.svg" alt="Pay Bills">
+                <h3>Pay Bills</h3>
+                <p>Settle your utility bills and subscriptions in seconds.</p>
+            </div>
+            <div class="feature" id="airtimeDataFeature" role="button" tabindex="0" aria-label="Airtime & Data - Top up your phone or buy data bundles anytime">
+                <img src="images/icon-onboarding.svg" alt="Airtime/Data">
+                <h3>Airtime & Data</h3>
+                <p>Top up your phone or buy data bundles anytime.</p>
+            </div>
+            <div class="feature" id="walletFeature" role="button" tabindex="0" aria-label="Wallet - Manage your digital wallet and track your spending">
+                <img src="images/icon-api.svg" alt="Wallet">
+                <h3>Wallet</h3>
+                <p>Manage your digital wallet and track your spending.</p>
+            </div>
+        </div>
+    </section>
+    <!-- <section id="download" class="download">
+        <h2>Download the App</h2>
+        <p>Coming soon to Google Play and App Store!</p>
+    </section> -->
+    <footer id="contact">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+            <p style="margin:0">&copy; 2025. Protected by CBN and Insured by NCC SimpleBank.</p>
+            <div style="display:flex;gap:0.6rem;align-items:center">
+                <!-- Facebook -->
+                <a href="https://facebook.com/psalmlordtimiz" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color:inherit;text-decoration:none;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M22 12C22 6.48 17.52 2 12 2S2 6.48 2 12c0 4.99 3.66 9.12 8.44 9.88v-6.99H7.9v-2.89h2.54V9.41c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.45h-1.25c-1.23 0-1.61.77-1.61 1.56v1.88h2.74l-.44 2.89h-2.3V21.9C18.34 21.12 22 16.99 22 12z" fill="#1877F2"/>
+                    </svg>
+                </a>
+                <!-- Instagram -->
+                <a href="https://instagram.com/yourhandle" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color:inherit;text-decoration:none;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z" stroke="#E1306C" stroke-width="1.5" fill="none"/>
+                        <circle cx="12" cy="12" r="3" stroke="#E1306C" stroke-width="1.5" fill="none"/>
+                        <circle cx="18.5" cy="5.5" r="0.5" fill="#E1306C"/>
+                    </svg>
+                </a>
+                <!-- WhatsApp -->
+                <a href="https://wa.me/08104427350" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" style="color:inherit;text-decoration:none;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M20.52 3.48A11.94 11.94 0 1 0 12 24v-2.12A9.88 9.88 0 1 1 21.88 5.48l-1.36-1.36z" fill="#25D366"/>
+                        <path d="M17.3 14.7c-.47-.24-2.78-1.36-3.21-1.51-.43-.15-.75-.24-1.07.24-.32.47-1.23 1.51-1.51 1.82-.28.31-.57.36-1.04.12-.47-.24-1.99-.73-3.79-2.35-1.4-1.34-2.34-2.98-2.61-3.45-.28-.47-.03-.72.21-.96.22-.22.47-.57.7-.86.23-.29.31-.48.47-.8.16-.32.08-.6-.04-.84-.12-.24-1.07-2.57-1.47-3.52-.39-.92-.79-.8-1.07-.8H6.4c-.32 0-.84.11-1.27.6C4.46 5.12 3.3 6.8 3.3 9.02c0 2.22 1.1 4.27 1.25 4.58.15.32 2.1 3.3 5.1 4.76 3 1.44 5.22 1.15 5.71 1.08.47-.07 2.9-1.18 3.32-2.33.43-1.15.43-2.15.3-2.33-.12-.2-.43-.31-.9-.56z" fill="#fff"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2 id="modalTitle">Login</h2>
+
+            <div id="authForms">
+                <form id="loginForm">
+                    <input id="loginUser" type="text" placeholder="Phone Number or Email" required>
+                    <input id="loginPass" type="password" placeholder="Password" required>
+                    <div style="display:flex;gap:.5rem;margin-top:.6rem;">
+                        <button type="submit" class="cta">Login</button>
+                        <button type="button" id="showSignup" style="background:#fff;border:1px solid #e5e7eb;color:#374151">Create account</button>
+                    </div>
+                </form>
+
+                <form id="signupForm" style="display:none">
+                    <input id="signupName" type="text" placeholder="Full name" required>
+                    <input id="signupUser" type="text" placeholder="Phone Number or Email" required>
+                    <div style="display:flex;gap:.5rem;align-items:center;">
+                        <input id="signupAccount" type="text" placeholder="Desired account number (10 digits)" inputmode="numeric" maxlength="10" style="flex:1;" required>
+                        <button type="button" id="generateAccount" style="background:#fff;border:1px solid #e5e7eb;color:#374151;padding:0.5rem 0.6rem;border-radius:8px">Generate</button>
+                    </div>
+                    <input id="signupPass" type="password" placeholder="Password" required>
+                    <input id="signupPass2" type="password" placeholder="Confirm Password" required>
+                    <input id="signupPin" type="password" inputmode="numeric" maxlength="6" placeholder="4-6 digit transaction PIN" required>
+                    <input id="signupPin2" type="password" inputmode="numeric" maxlength="6" placeholder="Confirm transaction PIN" required>
+                    <div style="display:flex;gap:.5rem;margin-top:.6rem;">
+                        <button type="submit" class="cta">Sign up</button>
+                        <button type="button" id="showLogin" style="background:#fff;border:1px solid #e5e7eb;color:#374151">Back to login</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="authMessage" style="margin-top:0.8rem;display:none;font-size:0.95rem"></div>
+        </div>
+    </div>
+    <script src="simplebanking.js"></script>
+</body>
+</html>

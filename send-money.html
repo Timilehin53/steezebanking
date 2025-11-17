@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        // auth guard: redirect to home and show login modal if not authenticated
+        (function(){
+            try {
+                const u = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+                if (!u) {
+                    localStorage.setItem('sb_show_login', '1');
+                    window.location.href = 'simplebanking.html#features';
+                }
+            } catch(e){ /* ignore */ }
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Money - SimpleBank</title>
+    <link rel="stylesheet" href="simplebanking.css">
+    <link rel="shortcut icon" href="./images/favicon-32x32.png" type="image/x-icon">
+    <style>
+        /* Styles for confirmation modal */
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+        }
+        .confirm-modal .modal-inner {
+            background: #fff;
+            padding: 1.25rem;
+            border-radius: 12px;
+            width: 92%;
+            max-width: 420px;
+        }
+        .modal-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .modal-actions button {
+            flex: 1;
+        }
+        .success-message {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(16,185,129,0.06);
+            margin-top: 1rem;
+        }
+        .error-text {
+            color: #b91c1c;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">TBanking</div>
+        <nav>
+            <a href="simplebanking.html#features">Home</a>
+        </nav>
+    </header>
+    <main style="padding:2rem; text-align:center;">
+        <h1>Send Money</h1>
+        <p>Transfer funds instantly to anyone, anywhere.</p>
+        <form id="sendMoneyForm" style="max-width:420px;margin:1rem auto;text-align:left;">
+            <label for="recipient">Enter Recipient Account Number</label>
+            <input id="recipient" type="text" placeholder="Account Number" style="width:100%;padding:0.6rem;margin:0.4rem 0;border-radius:8px;border:1px solid #e5e7eb;" required>
+            <label for="amount">Enter Amount</label>
+            <input id="amount" type="number" min="1" step="0.01" placeholder="$0.00" style="width:100%;padding:0.6rem;margin:0.4rem 0;border-radius:8px;border:1px solid #e5e7eb;" required>
+            <label for="recipientBank">Select Recipient Bank</label>
+            <select id="recipientBank" style="width:100%;padding:0.6rem;margin:0.4rem 0;border-radius:8px;border:1px solid #e5e7eb;" required>
+                <option value="" disabled selected> Choose recipient bank </option>
+                <optgroup label="Africa">
+                    <option value="zenith_ng">Zenith Bank</option>
+                    <option value="gtb_ng">GTBank</option>
+                    <option value="Palmpay_ng">Palmpay</option>
+                    <option value="Opay_ng">Opay</option>
+                    <option value="FCMB_ng">FCMB</option>
+                    <option value="Moniepoint MFB_ng">Moniepoint MFB</option>
+                    <option value="UBA_ng">UBA</option>
+                    <option value="access_ng">Access Bank</option>
+                    <option value="ecobank_ng">Ecobank </option>
+                    <option value="standard_bank_za">Standard Bank (South Africa)</option>
+                    <option value="absa_za">Absa (South Africa)</option>
+                </optgroup>
+                <optgroup label="Asia">
+                    <option value="icici_in">ICICI Bank (India)</option>
+                    <option value="hdfc_in">HDFC Bank (India)</option>
+                    <option value="bank_of_china_cn">Bank of China (China)</option>
+                    <option value="state_bank_india">State Bank of India (India)</option>
+                </optgroup>
+                <optgroup label="Europe">
+                    <option value="barclays_uk">Barclays (UK)</option>
+                    <option value="hsbc_uk">HSBC (UK)</option>
+                    <option value="llyods_uk">Lloyds (UK)</option>
+                    <option value="deutsche_de">Deutsche Bank (Germany)</option>
+                </optgroup>
+                <optgroup label="Americas">
+                    <option value="chase_us">Chase (USA)</option>
+                    <option value="bank_of_america_us">Bank of America (USA)</option>
+                    <option value="wellsfargo_us">Wells Fargo (USA)</option>
+                    <option value="scotiabank_ca">Scotiabank (Canada)</option>
+                </optgroup>
+                <optgroup label="Oceania">
+                    <option value="anz_au">ANZ (Australia)</option>
+                    <option value="nab_au">NAB (Australia)</option>
+                </optgroup>
+                <optgroup label="Other">
+                    <option value="other">Other / International Bank (use IBAN or SWIFT)</option>
+                </optgroup>
+            </select>
+            <button type="button" id="proceedBtn" class="cta" style="width:100%;margin-top:0.8rem;">Proceed</button>
+        </form>
+    </main>
+
+    <!-- Confirmation Modal -->
+    <div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-inner">
+            <h2>Confirm Transfer</h2>
+            <div id="confirmBody"></div>
+            <div class="modal-actions">
+                <button id="confirmSend" class="cta">Send Now</button>
+                <button id="cancelSend" style="background:#fff;border:1px solid #e5e7eb;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('sendMoneyForm');
+        const proceedBtn = document.getElementById('proceedBtn');
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmBody = document.getElementById('confirmBody');
+        const confirmSend = document.getElementById('confirmSend');
+        const cancelSend = document.getElementById('cancelSend');
+
+        function showModal(contentHtml) {
+            confirmBody.innerHTML = contentHtml;
+            confirmModal.style.display = 'flex';
+            confirmModal.setAttribute('aria-hidden', 'false');
+        }
+
+        function hideModal() {
+            confirmModal.style.display = 'none';
+            confirmModal.setAttribute('aria-hidden', 'true');
+        }
+
+        proceedBtn.addEventListener('click', () => {
+            const recipient = document.getElementById('recipient').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+            const bankSelect = document.getElementById('recipientBank');
+            const bankValue = bankSelect ? bankSelect.value : '';
+            const bankText = bankSelect ? bankSelect.options[bankSelect.selectedIndex].text : '';
+            
+            // Validation
+            const errors = [];
+            if (!recipient) errors.push('Please enter recipient account number');
+            if (!amount || amount <= 0) errors.push('Please enter a valid amount');
+            if (!bankValue) errors.push('Please select the recipient bank');
+            
+            if (errors.length) {
+                showModal('<p class="error-text">' + errors.join('<br>') + '</p>');
+                return;
+            }
+
+            // Extra note for 'Other' banks
+            const otherNote = bankValue === 'other' ? '<p style="margin-top:0.5rem;font-size:0.9em;color:#6b7280;">Note: For international/other banks please ensure you provide the correct IBAN or SWIFT code to avoid delays.</p>' : '';
+
+            // Show confirmation
+            const html = `
+                <p>Recipient: <strong>${recipient}</strong></p>
+                <p>Bank: <strong>${bankText}</strong></p>
+                <p>Amount: <strong>$${amount.toFixed(2)}</strong></p>
+                ${otherNote}
+                <p style="margin-top:0.5rem;font-size:0.9em;color:#6b7280;">Transfer fee: $0.00</p>
+            `;
+            showModal(html);
+        });
+
+        cancelSend.addEventListener('click', hideModal);
+
+        confirmSend.addEventListener('click', () => {
+            // Simulate processing
+            confirmSend.disabled = true;
+            confirmSend.textContent = 'Processing...';
+            
+            setTimeout(() => {
+                hideModal();
+                // Show success message
+                const success = document.createElement('div');
+                success.className = 'success-message';
+                success.innerHTML = '<h3 style="color:#10b981">Transfer Successful</h3><p style="color:#6b7280;margin-top:0.5rem;">Your money is on its way!</p>';
+                form.parentNode.insertBefore(success, form.nextSibling);
+                
+                // Reset form and button
+                form.reset();
+                confirmSend.disabled = false;
+                confirmSend.textContent = 'Send Now';
+            }, 1500);
+        });
+
+        // Close modal when clicking outside
+        confirmModal.addEventListener('click', (e) => {
+            if (e.target === confirmModal) hideModal();
+        });
+    </script>
+</body>
+</html>
