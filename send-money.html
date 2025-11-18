@@ -1,19 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <link rel="stylesheet" href="send-money.css">
 <head>
-    <script>
-        // auth guard: redirect to home and show login modal if not authenticated
-        (function(){
-            try {
-                const u = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
-                if (!u) {
-                    localStorage.setItem('sb_show_login', '1');
-                    window.location.href = 'simplebanking.html#features';
-                }
-            } catch(e){ /* ignore */ }
-        })();
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Send Money - SimpleBank</title>
@@ -61,7 +48,7 @@
     <header>
         <div class="logo">TBanking</div>
         <nav>
-            <a href="simplebanking.html#features">Home</a>
+            <a href="index.html#features">Home</a>
         </nav>
     </header>
     <main style="padding:2rem; text-align:center;">
@@ -207,6 +194,17 @@
         confirmModal.addEventListener('click', (e) => {
             if (e.target === confirmModal) hideModal();
         });
+
+        // auth guard: redirect to home and show login modal if not authenticated
+        (function(){
+            try {
+                const u = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+                if (!u) {
+                    localStorage.setItem('sb_show_login', '1');
+                    window.location.href = 'index.html#features';
+                }
+            } catch(e){ /* ignore */ }
+        })();
     </script>
 </body>
 </html>

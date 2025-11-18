@@ -5,7 +5,7 @@
         const u = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
         if (!u) {
             localStorage.setItem('sb_show_login', '1');
-            window.location.href = 'simple_bank.html#features';
+            window.location.href = 'index.html#features';
         }
     } catch(e){}
 
