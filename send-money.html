@@ -170,6 +170,10 @@
                     <div id="pinError" class="error-text" style="margin-top:0.5rem;display:block"></div>
                 </div>
             `;
+            // store details on modal so confirm handler can access them
+            confirmModal.dataset.recipient = recipient;
+            confirmModal.dataset.amount = String(amount);
+            confirmModal.dataset.bank = bankText;
             showModal(html);
         });
 
@@ -204,10 +208,25 @@
             
             setTimeout(() => {
                 hideModal();
-                // Show success message
+                // Build receipt
+                const sRecipient = confirmModal.dataset.recipient || '';
+                const sBank = confirmModal.dataset.bank || '';
+                const sAmount = Number(confirmModal.dataset.amount || 0);
+                let senderName = '';
+                try { const cur = JSON.parse(localStorage.getItem('sb_current_user')||'null'); senderName = cur && cur.name ? cur.name : ''; } catch(e){}
+                const ts = new Date().toLocaleString();
                 const success = document.createElement('div');
                 success.className = 'success-message';
-                success.innerHTML = '<h3 style="color:#10b981">Transfer Successful</h3><p style="color:#6b7280;margin-top:0.5rem;">Your money is on its way!</p>';
+                success.innerHTML = `
+                    <h3 style="color:#10b981">Transfer Successful</h3>
+                    <div style="color:#6b7280;margin-top:0.5rem;text-align:left">
+                        <p><strong>Sender:</strong> ${senderName}</p>
+                        <p><strong>Recipient:</strong> ${sRecipient}</p>
+                        <p><strong>Bank:</strong> ${sBank}</p>
+                        <p><strong>Amount:</strong> $${sAmount.toFixed(2)}</p>
+                        <p><strong>Time:</strong> ${ts}</p>
+                    </div>
+                `;
                 form.parentNode.insertBefore(success, form.nextSibling);
                 
                 // Reset form and button

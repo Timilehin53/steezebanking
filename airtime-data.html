@@ -299,12 +299,16 @@
                     <p>Phone Number: <strong>${phone}</strong></p>
                     <p>Amount: <strong>₦${amount.toFixed(2)}</strong></p>
                 </div>
-                <div style="margin-top:0.75rem;">
-                    <label for="confirmPin" style="display:block;font-weight:600;margin-bottom:0.25rem">Enter your PIN to confirm</label>
-                    <input id="confirmPin" type="password" inputmode="numeric" maxlength="6" placeholder="••••" style="width:100%;padding:0.6rem;border-radius:8px;border:1px solid #e5e7eb;">
-                    <div id="pinError" class="error-text" style="margin-top:0.5rem;display:block"></div>
-                </div>
+                    <div style="margin-top:0.75rem;">
+                        <label for="confirmPin" style="display:block;font-weight:600;margin-bottom:0.25rem">Enter your PIN to confirm</label>
+                        <input id="confirmPin" type="password" inputmode="numeric" maxlength="6" placeholder="••••" style="width:100%;padding:0.6rem;border-radius:8px;border:1px solid #e5e7eb;">
+                        <div id="pinError" class="error-text" style="margin-top:0.5rem;display:block"></div>
+                    </div>
             `);
+                // store details for receipt
+                modal.dataset.txType = 'airtime';
+                modal.dataset.phone = phone;
+                modal.dataset.amount = String(amount);
         });
 
         // Data bundle purchase
@@ -333,6 +337,11 @@
                     <div id="pinError" class="error-text" style="margin-top:0.5rem;display:block"></div>
                 </div>
             `);
+            // store details for receipt
+            modal.dataset.txType = 'data';
+            modal.dataset.phone = phone;
+            modal.dataset.bundle = bundleSize;
+            modal.dataset.amount = String(bundlePrice);
         });
 
         // Purchase confirmation
@@ -352,14 +361,39 @@
             
             setTimeout(() => {
                 hideModal();
-                // Show success message
+                // Build receipt from modal dataset
+                const txType = modal.dataset.txType || '';
+                const phone = modal.dataset.phone || '';
+                const amt = Number(modal.dataset.amount || 0);
+                const bundle = modal.dataset.bundle || '';
+                let senderName = '';
+                try { const cur = JSON.parse(localStorage.getItem('sb_current_user')||'null'); senderName = cur && cur.name ? cur.name : ''; } catch(e){}
+                const ts = new Date().toLocaleString();
                 const success = document.createElement('div');
                 success.className = 'card';
                 success.style.marginTop = '1rem';
-                success.innerHTML = `
-                    <h3 style="color:#10b981">Purchase Successful!</h3>
-                    <p style="color:#6b7280;margin-top:0.5rem;">Your transaction has been completed.</p>
-                `;
+                if (txType === 'airtime') {
+                    success.innerHTML = `
+                        <h3 style="color:#10b981">Airtime Purchase Successful!</h3>
+                        <div style="color:#6b7280;margin-top:0.5rem;text-align:left">
+                            <p><strong>Sender:</strong> ${senderName}</p>
+                            <p><strong>Phone:</strong> ${phone}</p>
+                            <p><strong>Amount:</strong> ₦${amt.toFixed(2)}</p>
+                            <p><strong>Time:</strong> ${ts}</p>
+                        </div>
+                    `;
+                } else {
+                    success.innerHTML = `
+                        <h3 style="color:#10b981">Purchase Successful!</h3>
+                        <div style="color:#6b7280;margin-top:0.5rem;text-align:left">
+                            <p><strong>Sender:</strong> ${senderName}</p>
+                            <p><strong>Phone:</strong> ${phone}</p>
+                            <p><strong>Bundle:</strong> ${bundle}</p>
+                            <p><strong>Amount:</strong> ₦${amt.toFixed(2)}</p>
+                            <p><strong>Time:</strong> ${ts}</p>
+                        </div>
+                    `;
+                }
                 document.querySelector('main.airtime-data').appendChild(success);
                 
                 // Reset forms

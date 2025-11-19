@@ -152,6 +152,10 @@
           <div id="pinError" class="error-text" style="margin-top:0.5rem;display:block"></div>
         </div>
       `;
+      // store details for receipt
+      confirmModal.dataset.biller = biller;
+      confirmModal.dataset.account = account;
+      confirmModal.dataset.amount = String(amount);
       showModal(html);
     });
 
@@ -176,11 +180,26 @@
       confirmPay.textContent = 'Processing...';
       setTimeout(() => {
         hideModal();
-        // show a quick success message on the page
+        const bBiller = confirmModal.dataset.biller || '';
+        const bAccount = confirmModal.dataset.account || '';
+        const bAmount = Number(confirmModal.dataset.amount || 0);
+        let senderName = '';
+        try { const cur = JSON.parse(localStorage.getItem('sb_current_user')||'null'); senderName = cur && cur.name ? cur.name : ''; } catch(e){}
+        const ts = new Date().toLocaleString();
+        // show a quick success message on the page with receipt details
         const success = document.createElement('div');
         success.className = 'card';
         success.style.marginTop = '1rem';
-        success.innerHTML = '<h3>Payment Successful</h3><p class="muted">Your bill payment was processed.</p>';
+        success.innerHTML = `
+          <h3>Payment Successful</h3>
+          <div style="color:#6b7280;margin-top:0.5rem;text-align:left">
+            <p><strong>Sender:</strong> ${senderName}</p>
+            <p><strong>Biller:</strong> ${bBiller}</p>
+            <p><strong>Account:</strong> ${bAccount}</p>
+            <p><strong>Amount:</strong> $${bAmount.toFixed(2)}</p>
+            <p><strong>Time:</strong> ${ts}</p>
+          </div>
+        `;
         document.querySelector('main.paybills').appendChild(success);
         confirmPay.disabled = false;
         confirmPay.textContent = 'Pay Now';
