@@ -9,10 +9,26 @@ if (loginBtn && modal) {
         modal.style.display = 'flex';
     };
 }
+// signup button behaviour: shows signup modal when anonymous, acts as logout when authed
 if (signupBtn && modal) {
-    signupBtn.onclick = function() {
-        modal.style.display = 'flex';
-    };
+    signupBtn.addEventListener('click', (e) => {
+        const cur = getCurrentUser();
+        if (cur) {
+            // logout
+            clearCurrentUser();
+            populateAuthButtons();
+            populateHeaderAccount();
+            populateHeaderBalance();
+            showMessage('Logged out');
+        } else {
+            // show signup modal
+            modal.style.display = 'flex';
+            if (signupForm) { signupForm.style.display = 'block'; }
+            if (loginForm) { loginForm.style.display = 'none'; }
+            if (modalTitle) { modalTitle.textContent = 'Create Account'; }
+            clearMessage();
+        }
+    });
 }
 if (closeModal && modal) {
     closeModal.onclick = function() {
@@ -115,6 +131,56 @@ function populateHeaderAccount() {
     } catch (e) {}
 }
 
+// populate header balance display (format currency)
+function populateHeaderBalance() {
+    try {
+        const balEl = document.getElementById('headerBalance');
+        const cur = getCurrentUser();
+        if (!balEl) return;
+        if (cur && typeof cur.balance !== 'undefined') {
+            const n = Number(cur.balance || 0);
+            try {
+                balEl.textContent = n.toLocaleString('en-NG', { style: 'currency', currency: 'NGN' });
+            } catch (e) {
+                balEl.textContent = '₦' + n.toFixed(2);
+            }
+        } else {
+            balEl.textContent = '';
+        }
+    } catch (e) {}
+}
+
+// also update login button text with first name when user is authenticated
+function populateLoginName() {
+    try {
+        const cur = getCurrentUser();
+        const navBtn = document.getElementById('loginBtn');
+        if (!navBtn) return;
+        if (cur && cur.name) {
+            // use first word of the stored "name" as first name
+            navBtn.textContent = cur.name.split(' ')[0];
+        } else {
+            navBtn.textContent = 'Login';
+        }
+    } catch (e) {}
+}
+
+// update signup button and login button based on auth state
+function populateAuthButtons() {
+    try {
+        populateLoginName();
+        const sbtn = document.getElementById('signupBtn');
+        if (!sbtn) return;
+        const cur = getCurrentUser();
+        if (cur) {
+            sbtn.textContent = 'Logout';
+            // (click behavior handled earlier to perform logout)
+        } else {
+            sbtn.textContent = 'Signup';
+        }
+    } catch (e) {}
+}
+
 // if page requested redirect to login, show modal on load
 if (localStorage.getItem('sb_show_login')) {
     // ensure modal exists and forms exist
@@ -176,18 +242,20 @@ if (signupForm) {
         } else {
             accountNumber = generateAccountNumber();
         }
-        // store pin and accountNumber with user (note: plain-text here for demo only)
-        users.push({ name, user, pass, pin, accountNumber });
+        // store pin, accountNumber and starting balance with user (note: plain-text here for demo only)
+        const newUser = { name, user, pass, pin, accountNumber, balance: 0 };
+        users.push(newUser);
         saveUsers(users);
-        showMessage('Account created successfully');
-        // auto-switch to login
+        // auto-login the newly created user and update UI
+        setCurrentUser(newUser);
+        showMessage('Account created and logged in');
         setTimeout(() => {
             signupForm.reset();
-            signupForm.style.display = 'none';
-            loginForm.style.display = 'block';
-            modalTitle.textContent = 'Login';
+            modal.style.display = 'none';
             clearMessage();
-            showMessage('Please login with your new account');
+            populateAuthButtons();
+            populateHeaderAccount();
+            populateHeaderBalance();
             // show the account number briefly
             setTimeout(() => {
                 showMessage('Your account no: ' + maskAccount(accountNumber));
@@ -226,7 +294,9 @@ if (loginForm) {
             setCurrentUser(found);
             const navBtn = document.getElementById('loginBtn');
             if (navBtn) navBtn.textContent = found.name.split(' ')[0];
+            populateAuthButtons();
             populateHeaderAccount();
+            populateHeaderBalance();
         }, 700);
     });
 }
@@ -250,5 +320,7 @@ addTileNavigation('payBillsFeature', 'pay-bills.html');
 addTileNavigation('airtimeDataFeature', 'airtime-data.html');
 addTileNavigation('walletFeature', 'wallet.html');
 
-// populate header on load
+// populate header and auth buttons on load
 populateHeaderAccount();
+populateAuthButtons();
+populateHeaderBalance();

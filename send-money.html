@@ -164,6 +164,11 @@
                 <p>Amount: <strong>$${amount.toFixed(2)}</strong></p>
                 ${otherNote}
                 <p style="margin-top:0.5rem;font-size:0.9em;color:#6b7280;">Transfer fee: $0.00</p>
+                <div style="margin-top:0.75rem;">
+                    <label for="confirmPin" style="display:block;font-weight:600;margin-bottom:0.25rem">Enter your PIN to confirm</label>
+                    <input id="confirmPin" type="password" inputmode="numeric" maxlength="6" placeholder="••••" style="width:100%;padding:0.6rem;border-radius:8px;border:1px solid #e5e7eb;">
+                    <div id="pinError" class="error-text" style="margin-top:0.5rem;display:block"></div>
+                </div>
             `;
             showModal(html);
         });
@@ -171,6 +176,28 @@
         cancelSend.addEventListener('click', hideModal);
 
         confirmSend.addEventListener('click', () => {
+            const pinInput = document.getElementById('confirmPin');
+            const pinError = document.getElementById('pinError');
+            if (pinError) pinError.textContent = '';
+            const pin = pinInput ? pinInput.value.trim() : '';
+            // verify current user's pin
+            try {
+                const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+                if (!cur) {
+                    // not authenticated - redirect to login
+                    localStorage.setItem('sb_show_login', '1');
+                    window.location.href = 'index.html#features';
+                    return;
+                }
+                if (!pin || String(cur.pin) !== String(pin)) {
+                    if (pinError) pinError.textContent = 'Invalid PIN';
+                    return;
+                }
+            } catch (e) {
+                if (pinError) pinError.textContent = 'Invalid PIN';
+                return;
+            }
+
             // Simulate processing
             confirmSend.disabled = true;
             confirmSend.textContent = 'Processing...';

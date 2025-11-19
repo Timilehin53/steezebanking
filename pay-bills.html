@@ -146,6 +146,11 @@
         <p class="muted">Biller: <strong>${biller}</strong></p>
         <p class="muted">Account: <strong>${account}</strong></p>
         <p class="muted">Amount: <strong>$${amount.toFixed(2)}</strong></p>
+        <div style="margin-top:0.75rem;">
+          <label for="confirmPin" style="display:block;font-weight:600;margin-bottom:0.25rem">Enter your PIN to confirm</label>
+          <input id="confirmPin" type="password" inputmode="numeric" maxlength="6" placeholder="••••" style="width:100%;padding:0.6rem;border-radius:8px;border:1px solid #e5e7eb;">
+          <div id="pinError" class="error-text" style="margin-top:0.5rem;display:block"></div>
+        </div>
       `;
       showModal(html);
     });
@@ -153,6 +158,19 @@
     cancelPay.addEventListener('click', hideModal);
 
     confirmPay.addEventListener('click', () => {
+      const pinInput = document.getElementById('confirmPin');
+      const pinError = document.getElementById('pinError');
+      if (pinError) pinError.textContent = '';
+      const pin = pinInput ? pinInput.value.trim() : '';
+      try {
+        const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+        if (!cur) { localStorage.setItem('sb_show_login','1'); window.location.href = 'index.html#features'; return; }
+        if (!pin || String(cur.pin) !== String(pin)) {
+          if (pinError) pinError.textContent = 'Invalid PIN';
+          return;
+        }
+      } catch (e) { if (pinError) pinError.textContent = 'Invalid PIN'; return; }
+
       // fake processing delay then success
       confirmPay.disabled = true;
       confirmPay.textContent = 'Processing...';
