@@ -152,6 +152,30 @@
             flex-wrap: wrap;
             gap: 1rem;
         }
+        /* Modal styles (wallet) */
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+        }
+        .confirm-modal .modal-inner {
+            background: #fff;
+            padding: 1.25rem;
+            border-radius: 12px;
+            width: 92%;
+            max-width: 420px;
+        }
+        .modal-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .modal-actions button { flex: 1; }
+        .error-text { color: #b91c1c; margin-top:0.5rem; }
         .legend-item {
             display: flex;
             align-items: center;
@@ -195,7 +219,9 @@
             <div class="card balance-card">
                 <h3>Total Balance</h3>
                 <div id="walletUserName" style="font-weight:600;opacity:0.95"></div>
-                <div class="balance-amount">₦245,678.90</div>
+                <div style="display:flex;align-items:center;gap:0.6rem">
+                    <div id="walletBalance" class="balance-amount" style="cursor:pointer" title="Click to show/hide balance">₦0.00</div>
+                </div>
                 <div style="display:flex;gap:0.6rem;align-items:center;margin-top:.6rem;">
                     <div id="walletAccount" style="font-size:0.95rem;opacity:0.95"></div>
                     <button id="copyAccount" style="background:rgba(255,255,255,0.15);border:none;padding:0.45rem 0.6rem;border-radius:8px;color:white;cursor:pointer">Copy</button>
@@ -207,8 +233,8 @@
             <div class="card">
                 <h3>Quick Actions</h3>
                 <div style="display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap;">
-                    <button class="cta" style="flex:1">Add Money</button>
-                    <button class="cta" style="flex:1;background:#fff;border:1px solid #e5e7eb;color:#374151">Withdraw</button>
+                        <button id="addMoneyBtn" class="cta" style="flex:1">Add Money</button>
+                        <button id="withdrawBtn" class="cta" style="flex:1;background:#fff;border:1px solid #e5e7eb;color:#374151">Withdraw</button>
                 </div>
             </div>
 
@@ -258,63 +284,40 @@
     </main>
 
     <script>
-        // Sample transaction data
-        const transactions = [
-            {
-                type: 'credit',
-                title: 'Money Received',
-                description: 'From John Doe',
-                amount: 15000,
-                date: '2025-11-05T14:30:00',
-                icon: '↓'
-            },
-            {
-                type: 'debit',
-                title: 'Airtime Purchase',
-                description: 'MTN - 08012345678',
-                amount: 1000,
-                date: '2025-11-05T12:15:00',
-                icon: '📱'
-            },
-            {
-                type: 'debit',
-                title: 'Electricity Bill',
-                description: 'IKEDC - Monthly',
-                amount: 25000,
-                date: '2025-11-04T16:45:00',
-                icon: '⚡'
-            },
-            {
-                type: 'debit',
-                title: 'Money Sent',
-                description: 'To Sarah Smith',
-                amount: 50000,
-                date: '2025-11-04T10:20:00',
-                icon: '↑'
-            }
-        ];
+        // Read transactions from localStorage (fallback to empty array)
+        function getStoredTransactions() {
+            try {
+                return JSON.parse(localStorage.getItem('sb_transactions') || '[]');
+            } catch (e) { return []; }
+        }
 
         // Populate transaction list
         function renderTransactions(txns) {
             const list = document.querySelector('.transaction-list');
-            list.innerHTML = txns.map(t => `
+            if (!Array.isArray(txns)) txns = [];
+            list.innerHTML = txns.map(t => {
+                const amount = Number(t.amount || 0);
+                const sign = t.type === 'credit' ? '+' : '-';
+                const amtClass = t.type === 'credit' ? 'amount-positive' : 'amount-negative';
+                const icon = t.icon || (t.type === 'credit' ? '↓' : '↑');
+                return `
                 <div class="transaction-item">
                     <div class="transaction-info">
-                        <div class="transaction-icon">${t.icon}</div>
+                        <div class="transaction-icon">${icon}</div>
                         <div class="transaction-details">
-                            <h4>${t.title}</h4>
-                            <p>${t.description}</p>
+                            <h4>${t.title || ''}</h4>
+                            <p>${t.description || ''}</p>
                         </div>
                     </div>
-                    <div class="transaction-amount ${t.type === 'credit' ? 'amount-positive' : 'amount-negative'}">
-                        ${t.type === 'credit' ? '+' : '-'}₦${t.amount.toLocaleString()}
+                    <div class="transaction-amount ${amtClass}">
+                        ${sign}₦${amount.toLocaleString()}
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
-        // Initialize with all transactions
-        renderTransactions(transactions);
+        // Initialize with stored transactions
+        renderTransactions(getStoredTransactions());
 
         // Filter buttons
         const filterBtns = document.querySelectorAll('.filter-btn');
@@ -324,8 +327,9 @@
                 filterBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
 
-                // Filter transactions (simple demo - could be expanded)
-                let filtered = [...transactions];
+                // Filter transactions (reads from stored transactions)
+                const stored = getStoredTransactions();
+                let filtered = [...stored];
                 const filter = btn.textContent.toLowerCase();
                 const now = new Date();
                 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -333,9 +337,9 @@
                 yesterday.setDate(yesterday.getDate() - 1);
 
                 if (filter === 'today') {
-                    filtered = transactions.filter(t => new Date(t.date) >= today);
+                    filtered = stored.filter(t => new Date(t.date) >= today);
                 } else if (filter === 'yesterday') {
-                    filtered = transactions.filter(t => {
+                    filtered = stored.filter(t => {
                         const date = new Date(t.date);
                         return date >= yesterday && date < today;
                     });
@@ -345,14 +349,137 @@
             });
         });
 
-        // Quick action buttons
-        document.querySelectorAll('.cta').forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Simulate action (could be expanded)
-                const action = btn.textContent;
-                alert(`${action} feature coming soon!`);
+        // Quick action buttons (wallet-specific)
+        (function wireQuickActions(){
+            const addBtn = document.getElementById('addMoneyBtn');
+            const withdrawBtn = document.getElementById('withdrawBtn');
+            const modal = document.getElementById('walletModal');
+            const modalTitle = document.getElementById('walletModalTitle');
+            const modalBody = document.getElementById('walletModalBody');
+            const modalConfirm = document.getElementById('walletConfirm');
+            const modalCancel = document.getElementById('walletCancel');
+
+            function showModal(title, html, action) {
+                modalTitle.textContent = title;
+                modalBody.innerHTML = html;
+                modal.style.display = 'flex';
+                modal.dataset.action = action || '';
+                modal.setAttribute('aria-hidden','false');
+            }
+
+            function hideModal() {
+                modal.style.display = 'none';
+                modal.dataset.action = '';
+                modal.setAttribute('aria-hidden','true');
+            }
+
+            // Add Money
+            if (addBtn) addBtn.addEventListener('click', () => {
+                showModal('Add Money', `
+                    <div>
+                        <label style="display:block;font-weight:600;margin-bottom:0.25rem">Amount</label>
+                        <input id="wmAmount" type="number" min="1" step="0.01" placeholder="₦0.00" style="width:100%;padding:0.6rem;border-radius:8px;border:1px solid #e5e7eb;">
+                        <label style="display:block;font-weight:600;margin:0.75rem 0 0.25rem">Enter PIN</label>
+                        <input id="wmPin" type="password" inputmode="numeric" maxlength="6" placeholder="••••" style="width:100%;padding:0.6rem;border-radius:8px;border:1px solid #e5e7eb;">
+                        <div id="wmError" class="error-text"></div>
+                    </div>
+                `, 'add');
             });
-        });
+
+            // Withdraw
+            if (withdrawBtn) withdrawBtn.addEventListener('click', () => {
+                showModal('Withdraw', `
+                    <div>
+                        <label style="display:block;font-weight:600;margin-bottom:0.25rem">Amount</label>
+                        <input id="wmAmount" type="number" min="1" step="0.01" placeholder="₦0.00" style="width:100%;padding:0.6rem;border-radius:8px;border:1px solid #e5e7eb;">
+                        <label style="display:block;font-weight:600;margin:0.75rem 0 0.25rem">Destination Account</label>
+                        <input id="wmDest" type="text" placeholder="Account number" style="width:100%;padding:0.6rem;border-radius:8px;border:1px solid #e5e7eb;">
+                        <label style="display:block;font-weight:600;margin:0.75rem 0 0.25rem">Enter PIN</label>
+                        <input id="wmPin" type="password" inputmode="numeric" maxlength="6" placeholder="••••" style="width:100%;padding:0.6rem;border-radius:8px;border:1px solid #e5e7eb;">
+                        <div id="wmError" class="error-text"></div>
+                    </div>
+                `, 'withdraw');
+            });
+
+            // Confirm handler
+            if (modalConfirm) modalConfirm.addEventListener('click', () => {
+                const action = modal.dataset.action || '';
+                const amountEl = document.getElementById('wmAmount');
+                const pinEl = document.getElementById('wmPin');
+                const destEl = document.getElementById('wmDest');
+                const errEl = document.getElementById('wmError');
+                if (errEl) errEl.textContent = '';
+                const amount = amountEl ? Number(amountEl.value || 0) : 0;
+                const pin = pinEl ? (pinEl.value || '').trim() : '';
+
+                try {
+                    const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+                    if (!cur) { localStorage.setItem('sb_show_login','1'); window.location.href='index.html#features'; return; }
+                    if (!pin || String(cur.pin) !== String(pin)) { if (errEl) errEl.textContent = 'Invalid PIN'; return; }
+
+                    if (!amount || amount <= 0) { if (errEl) errEl.textContent = 'Enter a valid amount'; return; }
+
+                    if (action === 'withdraw') {
+                        // check balance
+                        if (Number(cur.balance || 0) < amount) { if (errEl) errEl.textContent = 'Insufficient balance'; return; }
+                    }
+
+                    // process
+                    const tx = {
+                        id: 'tx_' + Date.now(),
+                        type: action === 'add' ? 'credit' : 'debit',
+                        title: action === 'add' ? 'Deposit' : 'Withdraw',
+                        description: action === 'add' ? 'Wallet top-up' : ('To ' + (destEl ? destEl.value.trim() : '')),
+                        amount: Number(amount),
+                        date: new Date().toISOString(),
+                        icon: action === 'add' ? '↓' : '↑'
+                    };
+
+                    const txs = JSON.parse(localStorage.getItem('sb_transactions') || '[]');
+                    txs.unshift(tx);
+                    localStorage.setItem('sb_transactions', JSON.stringify(txs));
+
+                    // update balances
+                    cur.balance = Number(cur.balance || 0) + (action === 'add' ? Number(amount) : -Number(amount));
+                    localStorage.setItem('sb_current_user', JSON.stringify(cur));
+                    const users = JSON.parse(localStorage.getItem('sb_users') || '[]');
+                    const idx = users.findIndex(u => u.user === cur.user || u.accountNumber === cur.accountNumber);
+                    if (idx >= 0) { users[idx].balance = cur.balance; localStorage.setItem('sb_users', JSON.stringify(users)); }
+
+                    // refresh UI (respect privacy setting)
+                    const balEl = document.getElementById('walletBalance');
+                    const hidden = localStorage.getItem('sb_hide_balance') === '1';
+                    if (balEl) balEl.textContent = hidden ? '₦••••••' : ('₦' + (Number(cur.balance || 0)).toLocaleString());
+                    // also update header balance if present
+                    try { const hb = document.getElementById('headerBalance'); if (hb) hb.textContent = hidden ? '₦••••••' : ('₦' + (Number(cur.balance || 0)).toLocaleString()); } catch(e) {}
+                    renderTransactions(getStoredTransactions());
+
+                    // show receipt
+                    const ts = new Date().toLocaleString();
+                    const success = document.createElement('div');
+                    success.className = 'card';
+                    success.style.marginTop = '1rem';
+                    success.innerHTML = `
+                        <h3 style="color:#10b981">${action === 'add' ? 'Deposit Successful' : 'Withdrawal Successful'}</h3>
+                        <div style="color:#6b7280;margin-top:0.5rem;text-align:left">
+                            <p><strong>Amount:</strong> ₦${Number(amount).toFixed(2)}</p>
+                            ${action === 'withdraw' ? `<p><strong>Destination:</strong> ${destEl ? destEl.value.trim() : ''}</p>` : ''}
+                            <p><strong>Time:</strong> ${ts}</p>
+                        </div>
+                    `;
+                    document.querySelector('main.wallet').appendChild(success);
+
+                    // cleanup
+                    hideModal();
+                } catch (e) {
+                    if (errEl) errEl.textContent = 'An error occurred';
+                }
+            });
+
+            if (modalCancel) modalCancel.addEventListener('click', () => { modal.style.display='none'; modal.setAttribute('aria-hidden','true'); });
+            // close when clicking outside
+            if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display='none'; });
+        })();
 
         // show current user info and account number
         (function showCurrentUser(){
@@ -364,6 +491,21 @@
                 const copyBtn = document.getElementById('copyAccount');
                 if (nameEl) nameEl.textContent = `Hello, ${current.name}`;
                 if (acctEl) acctEl.textContent = `Acct: ${current.accountNumber ? current.accountNumber : ''}`;
+                const balEl = document.getElementById('walletBalance');
+                const hidden = localStorage.getItem('sb_hide_balance') === '1';
+                if (balEl) balEl.textContent = hidden ? '₦••••••' : ('₦' + (Number(current.balance || 0)).toLocaleString());
+                if (balEl) {
+                    balEl.title = 'Click to show/hide balance';
+                    balEl.style.cursor = 'pointer';
+                    balEl.addEventListener('click', () => {
+                        const nowHidden = localStorage.getItem('sb_hide_balance') === '1';
+                        localStorage.setItem('sb_hide_balance', nowHidden ? '0' : '1');
+                        const hiddenNow = !nowHidden;
+                        if (balEl) balEl.textContent = hiddenNow ? '₦••••••' : ('₦' + (Number(current.balance || 0)).toLocaleString());
+                        // also update header if present on this page
+                        try { const hb = document.getElementById('headerBalance'); if (hb) hb.textContent = hiddenNow ? '₦••••••' : ('₦' + (Number(current.balance || 0)).toLocaleString()); } catch(e) {}
+                    });
+                }
                 if (copyBtn) {
                     copyBtn.addEventListener('click', async () => {
                         if (!current.accountNumber) return;
@@ -380,5 +522,17 @@
             } catch(e){}
         })();
     </script>
+
+    <!-- Wallet confirmation modal -->
+    <div class="confirm-modal" id="walletModal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-inner">
+            <h2 id="walletModalTitle">Confirm</h2>
+            <div id="walletModalBody"></div>
+            <div class="modal-actions">
+                <button id="walletConfirm" class="cta">Confirm</button>
+                <button id="walletCancel" style="background:#fff;border:1px solid #e5e7eb;">Cancel</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

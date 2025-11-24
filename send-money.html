@@ -228,7 +228,33 @@
                     </div>
                 `;
                 form.parentNode.insertBefore(success, form.nextSibling);
-                
+
+                // record transaction and update balance
+                try {
+                    const tx = {
+                        id: 'tx_' + Date.now(),
+                        type: 'debit',
+                        title: 'Money Sent',
+                        description: 'To ' + (sRecipient || ''),
+                        amount: Number(sAmount),
+                        date: new Date().toISOString(),
+                        icon: '↑'
+                    };
+                    const txs = JSON.parse(localStorage.getItem('sb_transactions') || '[]');
+                    txs.unshift(tx);
+                    localStorage.setItem('sb_transactions', JSON.stringify(txs));
+
+                    // update current user balance and persist to users list
+                    const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+                    if (cur) {
+                        cur.balance = Number(cur.balance || 0) - Number(sAmount);
+                        localStorage.setItem('sb_current_user', JSON.stringify(cur));
+                        const users = JSON.parse(localStorage.getItem('sb_users') || '[]');
+                        const idx = users.findIndex(u => u.user === cur.user || u.accountNumber === cur.accountNumber);
+                        if (idx >= 0) { users[idx].balance = cur.balance; localStorage.setItem('sb_users', JSON.stringify(users)); }
+                    }
+                } catch (e) { /* ignore */ }
+
                 // Reset form and button
                 form.reset();
                 confirmSend.disabled = false;

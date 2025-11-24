@@ -137,18 +137,38 @@ function populateHeaderBalance() {
         const balEl = document.getElementById('headerBalance');
         const cur = getCurrentUser();
         if (!balEl) return;
+        // show masked balance if user enabled privacy
+        const hidden = localStorage.getItem('sb_hide_balance') === '1';
         if (cur && typeof cur.balance !== 'undefined') {
             const n = Number(cur.balance || 0);
-            try {
-                balEl.textContent = n.toLocaleString('en-NG', { style: 'currency', currency: 'NGN' });
-            } catch (e) {
-                balEl.textContent = '₦' + n.toFixed(2);
+            if (hidden) {
+                balEl.textContent = '₦••••••';
+            } else {
+                try {
+                    balEl.textContent = n.toLocaleString('en-NG', { style: 'currency', currency: 'NGN' });
+                } catch (e) {
+                    balEl.textContent = '₦' + n.toFixed(2);
+                }
             }
         } else {
             balEl.textContent = '';
         }
+        // (no explicit toggle button label — header balance itself is clickable)
     } catch (e) {}
 }
+
+// balance privacy helpers
+function toggleBalanceHidden() {
+    const hidden = localStorage.getItem('sb_hide_balance') === '1';
+    localStorage.setItem('sb_hide_balance', hidden ? '0' : '1');
+    populateHeaderBalance();
+}
+
+// wire header balance click to toggle privacy
+try {
+    const balEl = document.getElementById('headerBalance');
+    if (balEl) { balEl.style.cursor = 'pointer'; balEl.addEventListener('click', toggleBalanceHidden); }
+} catch (e) {}
 
 // also update login button text with first name when user is authenticated
 function populateLoginName() {

@@ -11,11 +11,12 @@
     <header>
         <div class="logo">TBanking</div>
     <div id="headerAccount"></div>
-    <div id="headerBalance" style="font-weight:600;margin-left:0.6rem"></div>
+    <div style="display:flex;align-items:center;gap:0.4rem;">
+        <div id="headerBalance" style="font-weight:600;margin-left:0.6rem;cursor:pointer" title="Click to show/hide balance"></div>
+    </div>
         <nav>
             <a href="#about">About</a>
             <a href="#features">Features</a>
-            <!-- <a href="#download">Download</a> -->
             <a href="#contact">Contact</a>
             <button id="loginBtn">Login</button>
         </nav>
@@ -66,24 +67,24 @@
             <p style="margin:0">&copy; 2025. Protected by CBN and Insured by NCC SimpleBank.</p>
             <div style="display:flex;gap:0.6rem;align-items:center">
                 <!-- Facebook -->
-                <a href="https://facebook.com/psalmlordtimiz" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color:inherit;text-decoration:none;">
+                <a href="https://facebook.com/psalmlordtimiz" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color:#374151;text-decoration:none;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path d="M22 12C22 6.48 17.52 2 12 2S2 6.48 2 12c0 4.99 3.66 9.12 8.44 9.88v-6.99H7.9v-2.89h2.54V9.41c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.45h-1.25c-1.23 0-1.61.77-1.61 1.56v1.88h2.74l-.44 2.89h-2.3V21.9C18.34 21.12 22 16.99 22 12z" fill="#1877F2"/>
+                        <path d="M22 12C22 6.48 17.52 2 12 2S2 6.48 2 12c0 4.99 3.66 9.12 8.44 9.88v-6.99H7.9v-2.89h2.54V9.41c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.45h-1.25c-1.23 0-1.61.77-1.61 1.56v1.88h2.74l-.44 2.89h-2.3V21.9C18.34 21.12 22 16.99 22 12z" fill="currentColor"/>
                     </svg>
                 </a>
                 <!-- Instagram -->
-                <a href="https://instagram.com/yourhandle" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color:inherit;text-decoration:none;">
+                <a href="https://instagram.com/timisteeze890" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color:#374151;text-decoration:none;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z" stroke="#E1306C" stroke-width="1.5" fill="none"/>
-                        <circle cx="12" cy="12" r="3" stroke="#E1306C" stroke-width="1.5" fill="none"/>
-                        <circle cx="18.5" cy="5.5" r="0.5" fill="#E1306C"/>
+                        <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                        <circle cx="18.5" cy="5.5" r="0.5" fill="currentColor"/>
                     </svg>
                 </a>
                 <!-- WhatsApp -->
-                <a href="https://wa.me/08104427350" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" style="color:inherit;text-decoration:none;">
+                <a href="https://wa.me/08104427350" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" style="color:#374151;text-decoration:none;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path d="M20.52 3.48A11.94 11.94 0 1 0 12 24v-2.12A9.88 9.88 0 1 1 21.88 5.48l-1.36-1.36z" fill="#25D366"/>
-                        <path d="M17.3 14.7c-.47-.24-2.78-1.36-3.21-1.51-.43-.15-.75-.24-1.07.24-.32.47-1.23 1.51-1.51 1.82-.28.31-.57.36-1.04.12-.47-.24-1.99-.73-3.79-2.35-1.4-1.34-2.34-2.98-2.61-3.45-.28-.47-.03-.72.21-.96.22-.22.47-.57.7-.86.23-.29.31-.48.47-.8.16-.32.08-.6-.04-.84-.12-.24-1.07-2.57-1.47-3.52-.39-.92-.79-.8-1.07-.8H6.4c-.32 0-.84.11-1.27.6C4.46 5.12 3.3 6.8 3.3 9.02c0 2.22 1.1 4.27 1.25 4.58.15.32 2.1 3.3 5.1 4.76 3 1.44 5.22 1.15 5.71 1.08.47-.07 2.9-1.18 3.32-2.33.43-1.15.43-2.15.3-2.33-.12-.2-.43-.31-.9-.56z" fill="#fff"/>
+                        <path d="M20.52 3.48A11.94 11.94 0 1 0 12 24v-2.12A9.88 9.88 0 1 1 21.88 5.48l-1.36-1.36z" fill="currentColor"/>
+                        <path d="M17.3 14.7c-.47-.24-2.78-1.36-3.21-1.51-.43-.15-.75-.24-1.07.24-.32.47-1.23 1.51-1.51 1.82-.28.31-.57.36-1.04.12-.47-.24-1.99-.73-3.79-2.35-1.4-1.34-2.34-2.98-2.61-3.45-.28-.47-.03-.72.21-.96.22-.22.47-.57.7-.86.23-.29.31-.48.47-.8.16-.32.08-.6-.04-.84-.12-.24-1.07-2.57-1.47-3.52-.39-.92-.79-.8-1.07-.8H6.4c-.32 0-.84.11-1.27.6C4.46 5.12 3.3 6.8 3.3 9.02c0 2.22 1.1 4.27 1.25 4.58.15.32 2.1 3.3 5.1 4.76 3 1.44 5.22 1.15 5.71 1.08.47-.07 2.9-1.18 3.32-2.33.43-1.15.43-2.15.3-2.33-.12-.2-.43-.31-.9-.56z" fill="currentColor"/>
                     </svg>
                 </a>
             </div>
@@ -113,8 +114,8 @@
                     </div>
                     <input id="signupPass" type="password" placeholder="Password" required>
                     <input id="signupPass2" type="password" placeholder="Confirm Password" required>
-                    <input id="signupPin" type="password" inputmode="numeric" maxlength="6" placeholder="4-6 digit transaction PIN" required>
-                    <input id="signupPin2" type="password" inputmode="numeric" maxlength="6" placeholder="Confirm transaction PIN" required>
+                    <input id="signupPin" type="password" inputmode="numeric" maxlength="4" placeholder="4 digit transaction PIN" required>
+                    <input id="signupPin2" type="password" inputmode="numeric" maxlength="4" placeholder="Confirm transaction PIN" required>
                     <div style="display:flex;gap:.5rem;margin-top:.6rem;">
                         <button type="submit" class="cta">Sign up</button>
                         <button type="button" id="showLogin" style="background:#fff;border:1px solid #e5e7eb;color:#374151">Back to login</button>

@@ -167,8 +167,8 @@
                 <input type="number" id="airtime-amount" min="50" step="10" placeholder="Enter amount" required>
             </div>
             <div class="form-group">
-                <label for="data-provider">Network Provider</label>
-                <select id="data-provider" required>
+                <label for="airtime-provider">Network Provider</label>
+                <select id="airtime-provider" required>
                     <option value="">Select provider</option>
                     <option value="mtn">MTN</option>
                     <option value="airtel">Airtel</option>
@@ -396,12 +396,38 @@
                 }
                 document.querySelector('main.airtime-data').appendChild(success);
                 
+                // record transaction and update balance (persist to localStorage)
+                try {
+                    const tx = {
+                        id: 'tx_' + Date.now(),
+                        type: 'debit',
+                        title: txType === 'airtime' ? 'Airtime Purchase' : 'Data Purchase',
+                        description: txType === 'airtime' ? ('To ' + phone) : ('Bundle: ' + bundle + ' • To ' + phone),
+                        amount: Number(amt),
+                        date: new Date().toISOString(),
+                        icon: '↓'
+                    };
+                    const txs = JSON.parse(localStorage.getItem('sb_transactions') || '[]');
+                    txs.unshift(tx);
+                    localStorage.setItem('sb_transactions', JSON.stringify(txs));
+
+                    // update current user balance and persist to users list
+                    const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+                    if (cur) {
+                        cur.balance = Number(cur.balance || 0) - Number(amt);
+                        localStorage.setItem('sb_current_user', JSON.stringify(cur));
+                        const users = JSON.parse(localStorage.getItem('sb_users') || '[]');
+                        const idx = users.findIndex(u => u.user === cur.user || u.accountNumber === cur.accountNumber);
+                        if (idx >= 0) { users[idx].balance = cur.balance; localStorage.setItem('sb_users', JSON.stringify(users)); }
+                    }
+                } catch (e) { /* ignore errors */ }
+
                 // Reset forms
                 forms.airtime.reset();
                 forms.data.reset();
                 bundles.forEach(b => b.classList.remove('selected'));
                 selectedBundle = null;
-                
+
                 // Reset button
                 confirmBtn.disabled = false;
                 confirmBtn.textContent = 'Confirm';

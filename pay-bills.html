@@ -204,6 +204,31 @@
         confirmPay.disabled = false;
         confirmPay.textContent = 'Pay Now';
         form.reset();
+
+        // record transaction and update balance
+        try {
+          const tx = {
+            id: 'tx_' + Date.now(),
+            type: 'debit',
+            title: 'Bill Payment',
+            description: bBiller + ' - ' + bAccount,
+            amount: Number(bAmount),
+            date: new Date().toISOString(),
+            icon: '💡'
+          };
+          const txs = JSON.parse(localStorage.getItem('sb_transactions') || '[]');
+          txs.unshift(tx);
+          localStorage.setItem('sb_transactions', JSON.stringify(txs));
+
+          const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+          if (cur) {
+            cur.balance = Number(cur.balance || 0) - Number(bAmount);
+            localStorage.setItem('sb_current_user', JSON.stringify(cur));
+            const users = JSON.parse(localStorage.getItem('sb_users') || '[]');
+            const idx = users.findIndex(u => u.user === cur.user || u.accountNumber === cur.accountNumber);
+            if (idx >= 0) { users[idx].balance = cur.balance; localStorage.setItem('sb_users', JSON.stringify(users)); }
+          }
+        } catch(e) {}
       }, 1100);
     });
 
