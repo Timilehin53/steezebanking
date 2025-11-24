@@ -82,10 +82,10 @@
         <div class="form-row" style="margin-top:0.75rem;">
           <div class="col">
             <label for="amount">Amount</label>
-            <input id="amount" type="number" min="1" step="0.01" placeholder="$0.00" required>
+            <input id="amount" type="number" min="1" step="0.01" placeholder="₦0.00" required>
           </div>
           <div style="width:140px;display:flex;align-items:end;">
-            <div class="muted">Balance: <strong id="balance">$1,250.00</strong></div>
+            <div class="muted">Balance: <strong id="balance">₦1,250.00</strong></div>
           </div>
         </div>
 
@@ -143,9 +143,9 @@
       }
       // show confirmation
       const html = `
-        <p class="muted">Biller: <strong>${biller}</strong></p>
-        <p class="muted">Account: <strong>${account}</strong></p>
-        <p class="muted">Amount: <strong>$${amount.toFixed(2)}</strong></p>
+  <p class="muted">Biller: <strong>${biller}</strong></p>
+  <p class="muted">Account: <strong>${account}</strong></p>
+  <p class="muted">Amount: <strong>₦${amount.toFixed(2)}</strong></p>
         <div style="margin-top:0.75rem;">
           <label for="confirmPin" style="display:block;font-weight:600;margin-bottom:0.25rem">Enter your PIN to confirm</label>
           <input id="confirmPin" type="password" inputmode="numeric" maxlength="6" placeholder="••••" style="width:100%;padding:0.6rem;border-radius:8px;border:1px solid #e5e7eb;">
@@ -196,7 +196,7 @@
             <p><strong>Sender:</strong> ${senderName}</p>
             <p><strong>Biller:</strong> ${bBiller}</p>
             <p><strong>Account:</strong> ${bAccount}</p>
-            <p><strong>Amount:</strong> $${bAmount.toFixed(2)}</p>
+            <p><strong>Amount:</strong> ₦${bAmount.toFixed(2)}</p>
             <p><strong>Time:</strong> ${ts}</p>
           </div>
         `;

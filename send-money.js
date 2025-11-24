@@ -49,13 +49,13 @@
             // Extra note for 'Other' banks
             const otherNote = bankValue === 'other' ? '<p style="margin-top:0.5rem;font-size:0.9em;color:#6b7280;">Note: For international/other banks please ensure you provide the correct IBAN or SWIFT code to avoid delays.</p>' : '';
 
-            // Show confirmation
+            // Show confirmation (Naira)
             const html = `
                 <p>Recipient: <strong>${recipient}</strong></p>
                 <p>Bank: <strong>${bankText}</strong></p>
-                <p>Amount: <strong>$${amount.toFixed(2)}</strong></p>
+                <p>Amount: <strong>₦${amount.toFixed(2)}</strong></p>
                 ${otherNote}
-                <p style="margin-top:0.5rem;font-size:0.9em;color:#6b7280;">Transfer fee: $0.00</p>
+                <p style="margin-top:0.5rem;font-size:0.9em;color:#6b7280;">Transfer fee: ₦0.00</p>
             `;
             showModal(html);
         });

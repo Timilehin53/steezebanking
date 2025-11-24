@@ -58,7 +58,7 @@
             <label for="recipient">Enter Recipient Account Number</label>
             <input id="recipient" type="text" placeholder="Account Number" style="width:100%;padding:0.6rem;margin:0.4rem 0;border-radius:8px;border:1px solid #e5e7eb;" required>
             <label for="amount">Enter Amount</label>
-            <input id="amount" type="number" min="1" step="0.01" placeholder="$0.00" style="width:100%;padding:0.6rem;margin:0.4rem 0;border-radius:8px;border:1px solid #e5e7eb;" required>
+            <input id="amount" type="number" min="1" step="0.01" placeholder="₦0.00" style="width:100%;padding:0.6rem;margin:0.4rem 0;border-radius:8px;border:1px solid #e5e7eb;" required>
             <label for="recipientBank">Select Recipient Bank</label>
             <select id="recipientBank" style="width:100%;padding:0.6rem;margin:0.4rem 0;border-radius:8px;border:1px solid #e5e7eb;" required>
                 <option value="" disabled selected> Choose recipient bank </option>
@@ -161,9 +161,9 @@
             const html = `
                 <p>Recipient: <strong>${recipient}</strong></p>
                 <p>Bank: <strong>${bankText}</strong></p>
-                <p>Amount: <strong>$${amount.toFixed(2)}</strong></p>
+                <p>Amount: <strong>₦${amount.toFixed(2)}</strong></p>
                 ${otherNote}
-                <p style="margin-top:0.5rem;font-size:0.9em;color:#6b7280;">Transfer fee: $0.00</p>
+                <p style="margin-top:0.5rem;font-size:0.9em;color:#6b7280;">Transfer fee: ₦0.00</p>
                 <div style="margin-top:0.75rem;">
                     <label for="confirmPin" style="display:block;font-weight:600;margin-bottom:0.25rem">Enter your PIN to confirm</label>
                     <input id="confirmPin" type="password" inputmode="numeric" maxlength="6" placeholder="••••" style="width:100%;padding:0.6rem;border-radius:8px;border:1px solid #e5e7eb;">
@@ -223,7 +223,7 @@
                         <p><strong>Sender:</strong> ${senderName}</p>
                         <p><strong>Recipient:</strong> ${sRecipient}</p>
                         <p><strong>Bank:</strong> ${sBank}</p>
-                        <p><strong>Amount:</strong> $${sAmount.toFixed(2)}</p>
+                        <p><strong>Amount:</strong> ₦${sAmount.toFixed(2)}</p>
                         <p><strong>Time:</strong> ${ts}</p>
                     </div>
                 `;
