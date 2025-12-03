@@ -339,6 +339,9 @@ addTileNavigation('sendMoneyFeature', 'send-money.html');
 addTileNavigation('payBillsFeature', 'pay-bills.html');
 addTileNavigation('airtimeDataFeature', 'airtime-data.html');
 addTileNavigation('walletFeature', 'wallet.html');
+addTileNavigation('beneficiariesFeature', 'beneficiaries.html');
+addTileNavigation('analyticsFeature', 'analytics.html');
+addTileNavigation('settingsFeature', 'settings.html');
 
 // populate header and auth buttons on load
 populateHeaderAccount();
