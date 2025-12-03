@@ -217,7 +217,8 @@ if (localStorage.getItem('sb_show_login')) {
 if (signupForm) {
     signupForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const name = document.getElementById('signupName').value.trim();
+    const name = document.getElementById('signupName').value.trim();
+    const nickname = (document.getElementById('signupNickname') ? document.getElementById('signupNickname').value.trim() : '');
         const user = document.getElementById('signupUser').value.trim();
         const pass = document.getElementById('signupPass').value;
         const pass2 = document.getElementById('signupPass2').value;
@@ -263,7 +264,7 @@ if (signupForm) {
             accountNumber = generateAccountNumber();
         }
         // store pin, accountNumber and starting balance with user (note: plain-text here for demo only)
-        const newUser = { name, user, pass, pin, accountNumber, balance: 0 };
+    const newUser = { name, nickname: nickname || '', user, pass, pin, accountNumber, balance: 0 };
         users.push(newUser);
         saveUsers(users);
         // auto-login the newly created user and update UI
