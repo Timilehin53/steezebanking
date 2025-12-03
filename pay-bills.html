@@ -61,12 +61,39 @@
       <form id="payBillsForm">
         <div class="form-row">
           <div class="col">
+            <label for="billerType">Select Biller Type</label>
+            <select id="billerType" required>
+              <option value="">Choose biller type</option>
+              <option value="electricity">Electricity</option>
+              <option value="water">Water</option>
+              <option value="internet">Internet</option>
+              <option value="tv">TV Subscription</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top:0.75rem;" id="electricityRow" style="display:none;">
+          <div class="col">
+            <label for="biller">Select Electricity Company</label>
+            <select id="biller" required>
+              <option value="">Choose company</option>
+              <option value="EKEDC">EKEDC (Electricity Distribution Company)</option>
+              <option value="IKEDC">IKEDC (Ikeja Electric)</option>
+              <option value="KEDCO">KEDCO (Kano Electricity Distribution Company)</option>
+              <option value="PHED">PHED (Port Harcourt Electricity Distribution Company)</option>
+              <option value="ENUGU">Enugu Electricity Distribution Company</option>
+              <option value="IBADANELECTRIC">Ibadan Electricity Distribution Company</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top:0.75rem;" id="otherBillerRow">
+          <div class="col">
             <label for="biller">Select Biller</label>
             <select id="biller" required>
               <option value="">Choose biller</option>
-              <option value="electric">Electricity</option>
-              <option value="water">Water</option>
-              <option value="internet">Internet</option>
+              <option value="water">Water Board</option>
+              <option value="internet">Internet Provider</option>
               <option value="tv">TV Subscription</option>
             </select>
           </div>
@@ -112,11 +139,64 @@
   <script>
     // Basic client-side validation and confirmation
     const form = document.getElementById('payBillsForm');
+    const billerType = document.getElementById('billerType');
+    const electricityRow = document.getElementById('electricityRow');
+    const otherBillerRow = document.getElementById('otherBillerRow');
+    const billerSelect = document.getElementById('biller');
     const reviewBtn = document.getElementById('reviewBtn');
     const confirmModal = document.getElementById('confirmModal');
     const confirmBody = document.getElementById('confirmBody');
     const confirmPay = document.getElementById('confirmPay');
     const cancelPay = document.getElementById('cancelPay');
+
+    // Handle biller type change
+    billerType.addEventListener('change', (e) => {
+      if (e.target.value === 'electricity') {
+        electricityRow.style.display = 'flex';
+        otherBillerRow.style.display = 'none';
+        // Update biller select to show electricity companies
+        billerSelect.innerHTML = `
+          <option value="">Choose company</option>
+          <option value="EKEDC">EKEDC (Electricity Distribution Company)</option>
+          <option value="IKEDC">IKEDC (Ikeja Electric)</option>
+          <option value="KEDCO">KEDCO (Kano Electricity Distribution Company)</option>
+          <option value="PHED">PHED (Port Harcourt Electricity Distribution Company)</option>
+          <option value="ENUGU">Enugu Electricity Distribution Company</option>
+          <option value="IBADANELECTRIC">Ibadan Electricity Distribution Company</option>
+        `;
+      } else if (e.target.value === 'water') {
+        electricityRow.style.display = 'none';
+        otherBillerRow.style.display = 'flex';
+        billerSelect.innerHTML = `
+          <option value="">Choose biller</option>
+          <option value="LASHMA">Lagos State Water Corporation</option>
+          <option value="KWWC">Kano Water Works Company</option>
+          <option value="OWYC">Oyo Water Works Company</option>
+        `;
+      } else if (e.target.value === 'internet') {
+        electricityRow.style.display = 'none';
+        otherBillerRow.style.display = 'flex';
+        billerSelect.innerHTML = `
+          <option value="">Choose provider</option>
+          <option value="SPECTRANET">Spectranet</option>
+          <option value="SMILE">Smile Telecoms</option>
+          <option value="NTEL">Ntel</option>
+          <option value="STARCOMMS">Starcomms</option>
+        `;
+      } else if (e.target.value === 'tv') {
+        electricityRow.style.display = 'none';
+        otherBillerRow.style.display = 'flex';
+        billerSelect.innerHTML = `
+          <option value="">Choose provider</option>
+          <option value="DSTV">DStv</option>
+          <option value="GOTV">GoTV</option>
+          <option value="STARTIMES">Startimes</option>
+        `;
+      } else {
+        electricityRow.style.display = 'none';
+        otherBillerRow.style.display = 'none';
+      }
+    });
 
     function showModal(contentHtml) {
       confirmBody.innerHTML = contentHtml;
