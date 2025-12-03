@@ -236,6 +236,7 @@
         <div class="budget-header">
           <span class="budget-label">Send Money</span>
           <span class="budget-amount" id="sendMoneyBudgetText">₦0 / ₦50,000</span>
+          <button class="btn-small" id="editSendMoneyBtn" style="margin-left:0.5rem;">Edit</button>
         </div>
         <div class="budget-bar">
           <div class="budget-progress" id="sendMoneyProgress" style="width:0%"></div>
@@ -245,6 +246,7 @@
         <div class="budget-header">
           <span class="budget-label">Pay Bills</span>
           <span class="budget-amount" id="payBillsBudgetText">₦0 / ₦30,000</span>
+          <button class="btn-small" id="editPayBillsBtn" style="margin-left:0.5rem;">Edit</button>
         </div>
         <div class="budget-bar">
           <div class="budget-progress" id="payBillsProgress" style="width:0%"></div>
@@ -254,6 +256,7 @@
         <div class="budget-header">
           <span class="budget-label">Airtime & Data</span>
           <span class="budget-amount" id="airtimeBudgetText">₦0 / ₦20,000</span>
+          <button class="btn-small" id="editAirtimeBtn" style="margin-left:0.5rem;">Edit</button>
         </div>
         <div class="budget-bar">
           <div class="budget-progress" id="airtimeProgress" style="width:0%"></div>
@@ -446,24 +449,73 @@
       });
     }
 
-    // Update budget bars
-    function updateBudget(transactions) {
-      const budgets = {
+    // User budgets (loaded from storage per account)
+    let userBudgets = null;
+
+    function loadBudgets() {
+      try {
+        const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+        const defaults = {
+          'Send Money': { used: 0, limit: 50000 },
+          'Pay Bills': { used: 0, limit: 30000 },
+          'Airtime/Data': { used: 0, limit: 20000 }
+        };
+        if (!cur || !cur.accountNumber) { userBudgets = defaults; return; }
+        const key = 'sb_budgets_' + cur.accountNumber;
+        const stored = JSON.parse(localStorage.getItem(key) || 'null');
+        if (stored) {
+          // merge stored limits with defaults
+          userBudgets = Object.assign({}, defaults);
+          Object.keys(userBudgets).forEach(k => { userBudgets[k].limit = stored[k] && Number(stored[k].limit) ? Number(stored[k].limit) : userBudgets[k].limit; });
+        } else {
+          userBudgets = defaults;
+        }
+      } catch (e) { userBudgets = {
         'Send Money': { used: 0, limit: 50000 },
         'Pay Bills': { used: 0, limit: 30000 },
         'Airtime/Data': { used: 0, limit: 20000 }
-      };
+      }; }
+    }
+
+    function saveBudgets() {
+      try {
+        const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+        if (!cur || !cur.accountNumber) return;
+        const key = 'sb_budgets_' + cur.accountNumber;
+        localStorage.setItem(key, JSON.stringify(userBudgets));
+      } catch (e) {}
+    }
+
+    // Update budget bars (uses userBudgets for limits)
+    function updateBudget(transactions) {
+      if (!userBudgets) loadBudgets();
+      // reset used counters
+      Object.keys(userBudgets).forEach(k => userBudgets[k].used = 0);
 
       transactions.forEach(tx => {
-        if (tx.title === 'Send Money') budgets['Send Money'].used += tx.amount;
-        else if (tx.title === 'Bill Payment') budgets['Pay Bills'].used += tx.amount;
-        else if (tx.title.includes('Airtime') || tx.title.includes('Data')) budgets['Airtime/Data'].used += tx.amount;
+        if (tx.title === 'Send Money') userBudgets['Send Money'].used += tx.amount;
+        else if (tx.title === 'Bill Payment') userBudgets['Pay Bills'].used += tx.amount;
+        else if (tx.title.includes('Airtime') || tx.title.includes('Data')) userBudgets['Airtime/Data'].used += tx.amount;
       });
 
-      updateBudgetBar('sendMoney', budgets['Send Money']);
-      updateBudgetBar('payBills', budgets['Pay Bills']);
-      updateBudgetBar('airtime', budgets['Airtime/Data']);
+      updateBudgetBar('sendMoney', userBudgets['Send Money']);
+      updateBudgetBar('payBills', userBudgets['Pay Bills']);
+      updateBudgetBar('airtime', userBudgets['Airtime/Data']);
     }
+
+    // allow editing a budget via prompt (simple and lightweight)
+    function editBudget(category, idPrefix) {
+      if (!userBudgets) loadBudgets();
+      const current = userBudgets[category] && userBudgets[category].limit ? userBudgets[category].limit : 0;
+      const raw = prompt('Set new monthly limit for ' + category + ' (numbers only)', String(current));
+      if (raw === null) return; // cancelled
+      const val = Number(raw.replace(/[^0-9\.]/g, ''));
+      if (!val || val <= 0) { alert('Please enter a valid positive number'); return; }
+      userBudgets[category].limit = val;
+      saveBudgets();
+      updateAnalytics();
+    }
+
 
     function updateBudgetBar(id, budget) {
       const percentage = Math.min((budget.used / budget.limit) * 100, 100);
@@ -515,6 +567,11 @@
         updateAnalytics();
       });
     });
+
+    // attach budget edit button handlers
+    document.getElementById('editSendMoneyBtn').addEventListener('click', () => editBudget('Send Money', 'sendMoney'));
+    document.getElementById('editPayBillsBtn').addEventListener('click', () => editBudget('Pay Bills', 'payBills'));
+    document.getElementById('editAirtimeBtn').addEventListener('click', () => editBudget('Airtime/Data', 'airtime'));
 
     // Initial load
     updateAnalytics();
