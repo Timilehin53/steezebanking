@@ -284,9 +284,13 @@
     </main>
 
     <script>
-        // Read transactions from localStorage (fallback to empty array)
+        // Read transactions from localStorage for current user (fallback to shared sb_transactions)
         function getStoredTransactions() {
             try {
+                const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+                if (cur && cur.accountNumber) {
+                    return JSON.parse(localStorage.getItem('sb_transactions_' + cur.accountNumber) || '[]');
+                }
                 return JSON.parse(localStorage.getItem('sb_transactions') || '[]');
             } catch (e) { return []; }
         }

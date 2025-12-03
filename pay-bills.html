@@ -216,9 +216,13 @@
             date: new Date().toISOString(),
             icon: '💡'
           };
-          const txs = JSON.parse(localStorage.getItem('sb_transactions') || '[]');
-          txs.unshift(tx);
-          localStorage.setItem('sb_transactions', JSON.stringify(txs));
+          try {
+            const curUser = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+            const txKey = curUser && curUser.accountNumber ? ('sb_transactions_' + curUser.accountNumber) : 'sb_transactions';
+            const txs = JSON.parse(localStorage.getItem(txKey) || '[]');
+            txs.unshift(tx);
+            localStorage.setItem(txKey, JSON.stringify(txs));
+          } catch (e) { /* ignore */ }
 
           const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
           if (cur) {

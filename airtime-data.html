@@ -195,26 +195,179 @@
                     <option value="9mobile">9Mobile</option>
                 </select>
             </div>
+            <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;flex-wrap:wrap;" id="bundleFilters">
+                <button class="filter-duration active" data-duration="all">All</button>
+                <button class="filter-duration" data-duration="daily">Daily</button>
+                <button class="filter-duration" data-duration="night">Night</button>
+                <button class="filter-duration" data-duration="weekly">Weekly</button>
+                <button class="filter-duration" data-duration="monthly">Monthly</button>
+                <button class="filter-duration" data-duration="yearly">Yearly</button>
+            </div>
+
             <div class="data-bundles" id="dataBundles">
-                <div class="bundle-option" data-price="100" data-size="500MB">
+                <!-- Daily bundles -->
+                <div class="bundle-option" data-price="30" data-size="100MB" data-duration="daily">
+                    <div class="bundle-size">100MB</div>
+                    <div class="bundle-validity">Daily</div>
+                    <div class="bundle-price">₦30</div>
+                </div>
+                <div class="bundle-option" data-price="50" data-size="250MB" data-duration="daily">
+                    <div class="bundle-size">250MB</div>
+                    <div class="bundle-validity">Daily</div>
+                    <div class="bundle-price">₦50</div>
+                </div>
+                <div class="bundle-option" data-price="100" data-size="500MB" data-duration="daily">
                     <div class="bundle-size">500MB</div>
-                    <div class="bundle-validity">Valid for 1 day</div>
+                    <div class="bundle-validity">Daily</div>
                     <div class="bundle-price">₦100</div>
                 </div>
-                <div class="bundle-option" data-price="200" data-size="1GB">
+                <div class="bundle-option" data-price="150" data-size="750MB" data-duration="daily">
+                    <div class="bundle-size">750MB</div>
+                    <div class="bundle-validity">Daily</div>
+                    <div class="bundle-price">₦150</div>
+                </div>
+                <div class="bundle-option" data-price="200" data-size="1GB" data-duration="daily">
                     <div class="bundle-size">1GB</div>
-                    <div class="bundle-validity">Valid for 1 day</div>
+                    <div class="bundle-validity">Daily</div>
                     <div class="bundle-price">₦200</div>
                 </div>
-                <div class="bundle-option" data-price="1000" data-size="5GB">
+                <div class="bundle-option" data-price="300" data-size="2GB" data-duration="daily">
+                    <div class="bundle-size">2GB</div>
+                    <div class="bundle-validity">Daily</div>
+                    <div class="bundle-price">₦300</div>
+                </div>
+
+                <!-- Night bundles (special off-peak) -->
+                <div class="bundle-option" data-price="20" data-size="150MB" data-duration="night">
+                    <div class="bundle-size">150MB</div>
+                    <div class="bundle-validity">Night</div>
+                    <div class="bundle-price">₦20</div>
+                </div>
+                <div class="bundle-option" data-price="40" data-size="300MB" data-duration="night">
+                    <div class="bundle-size">300MB</div>
+                    <div class="bundle-validity">Night</div>
+                    <div class="bundle-price">₦40</div>
+                </div>
+                <div class="bundle-option" data-price="60" data-size="500MB" data-duration="night">
+                    <div class="bundle-size">500MB</div>
+                    <div class="bundle-validity">Night</div>
+                    <div class="bundle-price">₦60</div>
+                </div>
+                <div class="bundle-option" data-price="80" data-size="750MB" data-duration="night">
+                    <div class="bundle-size">750MB</div>
+                    <div class="bundle-validity">Night</div>
+                    <div class="bundle-price">₦80</div>
+                </div>
+                <div class="bundle-option" data-price="120" data-size="1.5GB" data-duration="night">
+                    <div class="bundle-size">1.5GB</div>
+                    <div class="bundle-validity">Night</div>
+                    <div class="bundle-price">₦120</div>
+                </div>
+
+                <!-- Weekly bundles -->
+                <div class="bundle-option" data-price="300" data-size="1GB" data-duration="weekly">
+                    <div class="bundle-size">1GB</div>
+                    <div class="bundle-validity">Weekly</div>
+                    <div class="bundle-price">₦300</div>
+                </div>
+                <div class="bundle-option" data-price="500" data-size="2GB" data-duration="weekly">
+                    <div class="bundle-size">2GB</div>
+                    <div class="bundle-validity">Weekly</div>
+                    <div class="bundle-price">₦500</div>
+                </div>
+                <div class="bundle-option" data-price="750" data-size="3GB" data-duration="weekly">
+                    <div class="bundle-size">3GB</div>
+                    <div class="bundle-validity">Weekly</div>
+                    <div class="bundle-price">₦750</div>
+                </div>
+                <div class="bundle-option" data-price="1000" data-size="5GB" data-duration="weekly">
                     <div class="bundle-size">5GB</div>
-                    <div class="bundle-validity">Valid for 7 days</div>
+                    <div class="bundle-validity">Weekly</div>
                     <div class="bundle-price">₦1,000</div>
                 </div>
-                <div class="bundle-option" data-price="1500" data-size="10GB">
-                    <div class="bundle-size">10GB</div>
-                    <div class="bundle-validity">Valid for 30 days</div>
+                <div class="bundle-option" data-price="1500" data-size="7GB" data-duration="weekly">
+                    <div class="bundle-size">7GB</div>
+                    <div class="bundle-validity">Weekly</div>
                     <div class="bundle-price">₦1,500</div>
+                </div>
+                <div class="bundle-option" data-price="1800" data-size="8GB" data-duration="weekly">
+                    <div class="bundle-size">8GB</div>
+                    <div class="bundle-validity">Weekly</div>
+                    <div class="bundle-price">₦1,800</div>
+                </div>
+                <div class="bundle-option" data-price="2500" data-size="12GB" data-duration="weekly">
+                    <div class="bundle-size">12GB</div>
+                    <div class="bundle-validity">Weekly</div>
+                    <div class="bundle-price">₦2,500</div>
+                </div>
+
+                <!-- Monthly bundles -->
+                <div class="bundle-option" data-price="1000" data-size="5GB" data-duration="monthly">
+                    <div class="bundle-size">5GB</div>
+                    <div class="bundle-validity">Monthly</div>
+                    <div class="bundle-price">₦1,000</div>
+                </div>
+                <div class="bundle-option" data-price="1500" data-size="10GB" data-duration="monthly">
+                    <div class="bundle-size">10GB</div>
+                    <div class="bundle-validity">Monthly</div>
+                    <div class="bundle-price">₦1,500</div>
+                </div>
+                <div class="bundle-option" data-price="2000" data-size="15GB" data-duration="monthly">
+                    <div class="bundle-size">15GB</div>
+                    <div class="bundle-validity">Monthly</div>
+                    <div class="bundle-price">₦2,000</div>
+                </div>
+                <div class="bundle-option" data-price="3000" data-size="25GB" data-duration="monthly">
+                    <div class="bundle-size">25GB</div>
+                    <div class="bundle-validity">Monthly</div>
+                    <div class="bundle-price">₦3,000</div>
+                </div>
+                <div class="bundle-option" data-price="4000" data-size="35GB" data-duration="monthly">
+                    <div class="bundle-size">35GB</div>
+                    <div class="bundle-validity">Monthly</div>
+                    <div class="bundle-price">₦4,000</div>
+                </div>
+                <div class="bundle-option" data-price="5000" data-size="50GB" data-duration="monthly">
+                    <div class="bundle-size">50GB</div>
+                    <div class="bundle-validity">Monthly</div>
+                    <div class="bundle-price">₦5,000</div>
+                </div>
+                <div class="bundle-option" data-price="8000" data-size="100GB" data-duration="monthly">
+                    <div class="bundle-size">100GB</div>
+                    <div class="bundle-validity">Monthly</div>
+                    <div class="bundle-price">₦8,000</div>
+                </div>
+
+                <!-- Yearly bundles -->
+                <div class="bundle-option" data-price="8000" data-size="60GB" data-duration="yearly">
+                    <div class="bundle-size">60GB</div>
+                    <div class="bundle-validity">Yearly</div>
+                    <div class="bundle-price">₦8,000</div>
+                </div>
+                <div class="bundle-option" data-price="10000" data-size="80GB" data-duration="yearly">
+                    <div class="bundle-size">80GB</div>
+                    <div class="bundle-validity">Yearly</div>
+                    <div class="bundle-price">₦10,000</div>
+                </div>
+                <div class="bundle-option" data-price="12000" data-size="120GB" data-duration="yearly">
+                    <div class="bundle-size">120GB</div>
+                    <div class="bundle-validity">Yearly</div>
+                    <div class="bundle-price">₦12,000</div>
+                </div>
+                <div class="bundle-option" data-price="15000" data-size="150GB" data-duration="yearly">
+                    <div class="bundle-size">150GB</div>
+                    <div class="bundle-validity">Yearly</div>
+                    <div class="bundle-price">₦15,000</div>
+                </div>
+                <div class="bundle-option" data-price="20000" data-size="250GB" data-duration="yearly">
+                    <div class="bundle-size">250GB</div>
+                    <div class="bundle-validity">Yearly</div>
+                    <div class="bundle-price">₦20,000</div>
+                </div>
+                <div class="bundle-option" data-price="30000" data-size="500GB" data-duration="yearly">
+                    <div class="bundle-size">500GB</div>
+                    <div class="bundle-validity">Yearly</div>
+                    <div class="bundle-price">₦30,000</div>
                 </div>
             </div>
             <button type="button" class="cta" style="width:100%" id="buyDataBtn">Buy Data Bundle</button>
@@ -242,7 +395,9 @@
         };
 
         tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const tabName = tab.dataset.tab;
                 // Update active tab
                 tabs.forEach(t => t.classList.remove('active'));
@@ -253,15 +408,41 @@
             });
         });
 
-        // Data bundle selection
-        const bundles = document.querySelectorAll('.bundle-option');
+        // Data bundle selection (scoped to data form only)
+        const dataForm = document.getElementById('dataForm');
+        const bundles = dataForm ? dataForm.querySelectorAll('.bundle-option') : [];
         let selectedBundle = null;
 
         bundles.forEach(bundle => {
-            bundle.addEventListener('click', () => {
+            bundle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // ignore clicks on hidden (filtered-out) bundles
+                if (bundle.style.display === 'none') return;
                 bundles.forEach(b => b.classList.remove('selected'));
                 bundle.classList.add('selected');
                 selectedBundle = bundle;
+            });
+        });
+
+        // Bundle duration filters (scoped to data form)
+        const durationFilters = dataForm ? dataForm.querySelectorAll('.filter-duration') : [];
+        durationFilters.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                durationFilters.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const dur = btn.dataset.duration;
+                bundles.forEach(b => {
+                    const bd = b.dataset.duration || 'all';
+                    b.style.display = (dur === 'all' || bd === dur) ? '' : 'none';
+                });
+                // clear selectedBundle if it was filtered out
+                if (selectedBundle && selectedBundle.style.display === 'none') {
+                    selectedBundle.classList.remove('selected');
+                    selectedBundle = null;
+                }
             });
         });
 
@@ -323,6 +504,9 @@
 
             const bundleSize = selectedBundle.dataset.size;
             const bundlePrice = selectedBundle.dataset.price;
+            const bundleDuration = selectedBundle.dataset.duration || '';
+            const isNight = bundleDuration === 'night';
+            const nightNote = isNight ? `<p style="color:#b45309;margin-top:0.5rem"><strong>Note:</strong> Night bundles are available between <strong>11:00 PM</strong> till <strong>6:30 AM</strong>. Make sure your device is active at that time to use this bundle.</p>` : '';
 
             showModal('Confirm Data Purchase', `
                 <div style="color:#6b7280">
@@ -330,6 +514,7 @@
                     <p>Network: <strong>${provider.toUpperCase()}</strong></p>
                     <p>Bundle: <strong>${bundleSize}</strong></p>
                     <p>Amount: <strong>₦${bundlePrice}</strong></p>
+                    ${nightNote}
                 </div>
                 <div style="margin-top:0.75rem;">
                     <label for="confirmPin" style="display:block;font-weight:600;margin-bottom:0.25rem">Enter your PIN to confirm</label>
@@ -342,6 +527,7 @@
             modal.dataset.phone = phone;
             modal.dataset.bundle = bundleSize;
             modal.dataset.amount = String(bundlePrice);
+            modal.dataset.duration = bundleDuration;
         });
 
         // Purchase confirmation
@@ -354,6 +540,20 @@
                 const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
                 if (!cur) { localStorage.setItem('sb_show_login','1'); window.location.href = 'index.html#features'; return; }
                 if (!pin || String(cur.pin) !== String(pin)) { if (pinError) pinError.textContent = 'Invalid PIN'; return; }
+                // If this is a night bundle, validate current local time is within 23:00 - 06:30
+                try {
+                    const dur = modal.dataset.duration || '';
+                    if (dur === 'night') {
+                        const now = new Date();
+                        const h = now.getHours();
+                        const m = now.getMinutes();
+                        const inWindow = (h >= 23) || (h < 6) || (h === 6 && m <= 30);
+                        if (!inWindow) {
+                            if (pinError) pinError.textContent = 'Night bundles can only be purchased between 11:00 PM and 6:30 AM';
+                            return;
+                        }
+                    }
+                } catch(e) {}
             } catch (e) { if (pinError) pinError.textContent = 'Invalid PIN'; return; }
 
             confirmBtn.disabled = true;
@@ -407,9 +607,13 @@
                         date: new Date().toISOString(),
                         icon: '↓'
                     };
-                    const txs = JSON.parse(localStorage.getItem('sb_transactions') || '[]');
-                    txs.unshift(tx);
-                    localStorage.setItem('sb_transactions', JSON.stringify(txs));
+                    try {
+                        const curUser = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+                        const txKey = curUser && curUser.accountNumber ? ('sb_transactions_' + curUser.accountNumber) : 'sb_transactions';
+                        const txs = JSON.parse(localStorage.getItem(txKey) || '[]');
+                        txs.unshift(tx);
+                        localStorage.setItem(txKey, JSON.stringify(txs));
+                    } catch (e) { /* ignore */ }
 
                     // update current user balance and persist to users list
                     const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
