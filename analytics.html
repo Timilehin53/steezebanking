@@ -118,6 +118,12 @@
     .budget-progress.danger {
       background: linear-gradient(90deg, #ef4444, #dc2626);
     }
+    .budget-alert {
+      margin-top: 0.5rem;
+      color: #ef4444;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
     .period-selector {
       display: flex;
       gap: 0.5rem;
@@ -247,6 +253,7 @@
         <div class="budget-bar">
           <div class="budget-progress" id="sendMoneyProgress" style="width:0%"></div>
         </div>
+        <div id="sendMoneyAlert" class="budget-alert" style="display:none">You have reached or exceeded this budget.</div>
       </div>
       <div class="budget-item">
         <div class="budget-header">
@@ -263,6 +270,7 @@
         <div class="budget-bar">
           <div class="budget-progress" id="payBillsProgress" style="width:0%"></div>
         </div>
+        <div id="payBillsAlert" class="budget-alert" style="display:none">You have reached or exceeded this budget.</div>
       </div>
       <div class="budget-item">
         <div class="budget-header">
@@ -279,6 +287,7 @@
         <div class="budget-bar">
           <div class="budget-progress" id="airtimeProgress" style="width:0%"></div>
         </div>
+        <div id="airtimeAlert" class="budget-alert" style="display:none">You have reached or exceeded this budget.</div>
       </div>
     </div>
 
@@ -581,6 +590,29 @@
       } else {
         progress.className = 'budget-progress';
       }
+
+      // Alert user when budget limit is reached or exceeded (once per account+category)
+      try {
+        const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+        const acct = cur && cur.accountNumber ? cur.accountNumber : 'guest';
+        const alertKey = 'sb_budget_alert_' + acct + '_' + id;
+        const alertEl = document.getElementById(id + 'Alert');
+        if (budget.limit && budget.used >= budget.limit) {
+          // show inline alert
+          if (alertEl) alertEl.style.display = 'block';
+          // if not alerted before, do a browser alert once and set flag
+          if (localStorage.getItem(alertKey) !== '1') {
+            try { alert('Budget limit reached: ' + (id.replace(/([A-Z])/g, ' $1').trim()) + '\nYou have reached or exceeded your set limit.'); } catch(e) {}
+            localStorage.setItem(alertKey, '1');
+          }
+        } else {
+          // clear any previous inline alert and flag if usage back under limit
+          if (alertEl) alertEl.style.display = 'none';
+          if (localStorage.getItem(alertKey) === '1') {
+            localStorage.removeItem(alertKey);
+          }
+        }
+      } catch (e) { /* non-fatal */ }
     }
 
     // Update top transactions list
