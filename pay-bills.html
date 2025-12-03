@@ -326,6 +326,8 @@
             const users = JSON.parse(localStorage.getItem('sb_users') || '[]');
             const idx = users.findIndex(u => u.user === cur.user || u.accountNumber === cur.accountNumber);
             if (idx >= 0) { users[idx].balance = cur.balance; localStorage.setItem('sb_users', JSON.stringify(users)); }
+            // Refresh balance display
+            loadBalance();
           }
         } catch(e) {}
       }, 1100);
@@ -335,6 +337,29 @@
     confirmModal.addEventListener('click', (e) => {
       if (e.target === confirmModal) hideModal();
     });
+
+    // Load and display current user balance
+    function loadBalance() {
+      try {
+        const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+        if (cur) {
+          const balance = Number(cur.balance || 0);
+          const balanceElement = document.getElementById('balance');
+          if (balanceElement) {
+            const formattedBalance = new Intl.NumberFormat('en-NG', {
+              style: 'currency',
+              currency: 'NGN',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            }).format(balance).replace('₦', '').trim();
+            balanceElement.textContent = '₦' + formattedBalance;
+          }
+        }
+      } catch (e) { console.error('Error loading balance:', e); }
+    }
+
+    // Load balance on page load
+    loadBalance();
   </script>
 
 </body>
