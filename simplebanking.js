@@ -123,8 +123,16 @@ function populateHeaderAccount() {
         const hdr = document.getElementById('headerAccount');
         const cur = getCurrentUser();
         if (!hdr) return;
-        if (cur && cur.accountNumber) {
-            hdr.textContent = 'Acct: ' + cur.accountNumber;
+        if (cur) {
+            // prefer nickname, fall back to first name, otherwise show account number
+            const nick = cur.nickname || (cur.name ? cur.name.split(' ')[0] : '');
+            if (nick) {
+                hdr.textContent = nick;
+            } else if (cur.accountNumber) {
+                hdr.textContent = 'Acct: ' + cur.accountNumber;
+            } else {
+                hdr.textContent = '';
+            }
         } else {
             hdr.textContent = '';
         }
@@ -178,7 +186,7 @@ function populateLoginName() {
         if (!navBtn) return;
         if (cur && cur.name) {
             // use first word of the stored "name" as first name
-            navBtn.textContent = cur.name.split(' ')[0];
+            navBtn.textContent = cur.nickname || cur.name.split(' ')[0];
         } else {
             navBtn.textContent = 'Login';
         }
@@ -314,7 +322,7 @@ if (loginForm) {
             // indicate logged-in state (replace login button text) and persist current user
             setCurrentUser(found);
             const navBtn = document.getElementById('loginBtn');
-            if (navBtn) navBtn.textContent = found.name.split(' ')[0];
+            if (navBtn) navBtn.textContent = found.nickname || (found.name ? found.name.split(' ')[0] : 'Login');
             populateAuthButtons();
             populateHeaderAccount();
             populateHeaderBalance();
