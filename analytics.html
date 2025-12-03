@@ -338,16 +338,36 @@
         else if (tx.title === 'Add Money') categories['Add Money'] += tx.amount;
       });
 
+      const total = Object.values(categories).reduce((a, b) => a + b, 0);
+
+      // Group small categories into "Other" to avoid one tiny slice per category
+      const threshold = total * 0.05; // 5% threshold
+      const grouped = {};
+      let otherSum = 0;
+      Object.entries(categories).forEach(([k, v]) => {
+        if (v === 0) return; // skip zeros
+        if (total > 0 && v < threshold) {
+          otherSum += v;
+        } else {
+          grouped[k] = v;
+        }
+      });
+      if (otherSum > 0) grouped['Other'] = otherSum;
+
+      const labels = Object.keys(grouped);
+      const data = Object.values(grouped);
+      const colors = ['#10b981', '#ef4444', '#f59e0b', '#3b82f6', '#9ca3af'];
+
       const ctx = document.getElementById('categoryChart').getContext('2d');
       if (categoryChart) categoryChart.destroy();
 
       categoryChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: Object.keys(categories),
+          labels,
           datasets: [{
-            data: Object.values(categories),
-            backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#3b82f6'],
+            data,
+            backgroundColor: colors.slice(0, labels.length),
             borderColor: '#fff',
             borderWidth: 2
           }]
@@ -355,18 +375,29 @@
         options: {
           responsive: true,
           plugins: {
-            legend: { position: 'bottom' }
+            legend: { position: 'bottom' },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const val = context.parsed || 0;
+                  const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                  return context.label + ': ₦' + val.toLocaleString() + ' (' + pct + '%)';
+                }
+              }
+            }
           }
         }
       });
 
-      // Update insights
-      const topCategory = Object.entries(categories).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+      // Update insights (include percentages)
+      const topEntry = Object.entries(grouped).reduce((a, b) => a[1] > b[1] ? a : b, [null,0]);
+      const topCategory = topEntry[0] || '—';
+      const topPct = total > 0 ? Math.round((topEntry[1] / total) * 100) : 0;
       const insights = document.getElementById('categoryInsights');
       insights.innerHTML = `
-        <li>💰 Top spending category: <strong>${topCategory}</strong></li>
-        <li>📉 Total categorized: <strong>₦${Object.values(categories).reduce((a, b) => a + b, 0).toLocaleString()}</strong></li>
-        <li>✅ Keep tracking to see more insights</li>
+        <li>💰 Top spending category: <strong>${topCategory}</strong> (${topPct}%)</li>
+        <li>📉 Total categorized: <strong>₦${total.toLocaleString()}</strong></li>
+        <li>✅ Small categories grouped into <strong>Other</strong> for clarity</li>
       `;
     }
 
