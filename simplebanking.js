@@ -228,6 +228,7 @@ if (signupForm) {
     const name = document.getElementById('signupName').value.trim();
     const nickname = (document.getElementById('signupNickname') ? document.getElementById('signupNickname').value.trim() : '');
         const user = document.getElementById('signupUser').value.trim();
+        const email = (document.getElementById('signupEmail') ? document.getElementById('signupEmail').value.trim() : '');
         const pass = document.getElementById('signupPass').value;
         const pass2 = document.getElementById('signupPass2').value;
         if (!name || !user || !pass) {
@@ -257,6 +258,10 @@ if (signupForm) {
             showMessage('An account with this email/phone already exists', true);
             return;
         }
+        if (email && users.find(u => u.email === email)) {
+            showMessage('That email is already in use', true);
+            return;
+        }
         let accountNumber = '';
         if (acctInput) {
             if (!/^[0-9]{10}$/.test(acctInput)) {
@@ -272,7 +277,7 @@ if (signupForm) {
             accountNumber = generateAccountNumber();
         }
         // store pin, accountNumber and starting balance with user (note: plain-text here for demo only)
-    const newUser = { name, nickname: nickname || '', user, pass, pin, accountNumber, balance: 0 };
+    const newUser = { name, nickname: nickname || '', user, email: email || '', pass, pin, accountNumber, balance: 0 };
         users.push(newUser);
         saveUsers(users);
         // auto-login the newly created user and update UI
