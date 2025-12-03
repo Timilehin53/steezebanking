@@ -237,6 +237,12 @@
           <span class="budget-label">Send Money</span>
           <span class="budget-amount" id="sendMoneyBudgetText">₦0 / ₦50,000</span>
           <button class="btn-small" id="editSendMoneyBtn" style="margin-left:0.5rem;">Edit</button>
+          <select id="sendMoneyPeriod" style="margin-left:0.5rem; padding:0.4rem; border-radius:6px;">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly" selected>Monthly</option>
+            <option value="yearly">Yearly</option>
+          </select>
         </div>
         <div class="budget-bar">
           <div class="budget-progress" id="sendMoneyProgress" style="width:0%"></div>
@@ -247,6 +253,12 @@
           <span class="budget-label">Pay Bills</span>
           <span class="budget-amount" id="payBillsBudgetText">₦0 / ₦30,000</span>
           <button class="btn-small" id="editPayBillsBtn" style="margin-left:0.5rem;">Edit</button>
+          <select id="payBillsPeriod" style="margin-left:0.5rem; padding:0.4rem; border-radius:6px;">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly" selected>Monthly</option>
+            <option value="yearly">Yearly</option>
+          </select>
         </div>
         <div class="budget-bar">
           <div class="budget-progress" id="payBillsProgress" style="width:0%"></div>
@@ -257,6 +269,12 @@
           <span class="budget-label">Airtime & Data</span>
           <span class="budget-amount" id="airtimeBudgetText">₦0 / ₦20,000</span>
           <button class="btn-small" id="editAirtimeBtn" style="margin-left:0.5rem;">Edit</button>
+          <select id="airtimePeriod" style="margin-left:0.5rem; padding:0.4rem; border-radius:6px;">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly" selected>Monthly</option>
+            <option value="yearly">Yearly</option>
+          </select>
         </div>
         <div class="budget-bar">
           <div class="budget-progress" id="airtimeProgress" style="width:0%"></div>
@@ -464,11 +482,18 @@
         const key = 'sb_budgets_' + cur.accountNumber;
         const stored = JSON.parse(localStorage.getItem(key) || 'null');
         if (stored) {
-          // merge stored limits with defaults
+          // merge stored limits with defaults (also preserve period if present)
           userBudgets = Object.assign({}, defaults);
-          Object.keys(userBudgets).forEach(k => { userBudgets[k].limit = stored[k] && Number(stored[k].limit) ? Number(stored[k].limit) : userBudgets[k].limit; });
+          Object.keys(userBudgets).forEach(k => {
+            if (stored[k]) {
+              userBudgets[k].limit = Number(stored[k].limit) || userBudgets[k].limit;
+              userBudgets[k].period = stored[k].period || 'monthly';
+            }
+          });
         } else {
           userBudgets = defaults;
+          // default period
+          Object.keys(userBudgets).forEach(k => userBudgets[k].period = 'monthly');
         }
       } catch (e) { userBudgets = {
         'Send Money': { used: 0, limit: 50000 },
@@ -491,11 +516,33 @@
       if (!userBudgets) loadBudgets();
       // reset used counters
       Object.keys(userBudgets).forEach(k => userBudgets[k].used = 0);
+      // For budgets we calculate usage against the budget's own period (daily/weekly/monthly/yearly)
+      const allTx = getTransactions();
+      allTx.forEach(tx => {
+        const txDate = new Date(tx.date);
+        // helper to check if txDate is within a period relative to now
+        function withinPeriod(period) {
+          const now = new Date();
+          switch((period||'monthly')) {
+            case 'daily':
+              return txDate.toDateString() === now.toDateString();
+            case 'weekly': {
+              const start = new Date(now);
+              start.setDate(now.getDate() - 6);
+              start.setHours(0,0,0,0);
+              return txDate >= start && txDate <= now;
+            }
+            case 'yearly':
+              return txDate.getFullYear() === now.getFullYear();
+            case 'monthly':
+            default:
+              return txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear();
+          }
+        }
 
-      transactions.forEach(tx => {
-        if (tx.title === 'Send Money') userBudgets['Send Money'].used += tx.amount;
-        else if (tx.title === 'Bill Payment') userBudgets['Pay Bills'].used += tx.amount;
-        else if (tx.title.includes('Airtime') || tx.title.includes('Data')) userBudgets['Airtime/Data'].used += tx.amount;
+        if (tx.title === 'Send Money' && withinPeriod(userBudgets['Send Money'].period)) userBudgets['Send Money'].used += tx.amount;
+        else if (tx.title === 'Bill Payment' && withinPeriod(userBudgets['Pay Bills'].period)) userBudgets['Pay Bills'].used += tx.amount;
+        else if ((tx.title.includes('Airtime') || tx.title.includes('Data')) && withinPeriod(userBudgets['Airtime/Data'].period)) userBudgets['Airtime/Data'].used += tx.amount;
       });
 
       updateBudgetBar('sendMoney', userBudgets['Send Money']);
@@ -524,7 +571,8 @@
 
       progress.style.width = percentage + '%';
       progress.textContent = Math.round(percentage) + '%';
-      text.textContent = '₦' + budget.used.toLocaleString() + ' / ₦' + budget.limit.toLocaleString();
+      const periodLabel = (budget.period ? (budget.period.charAt(0).toUpperCase() + budget.period.slice(1)) : 'Monthly');
+      text.textContent = '₦' + budget.used.toLocaleString() + ' / ₦' + budget.limit.toLocaleString() + ' • ' + periodLabel;
 
       if (percentage > 80) {
         progress.className = 'budget-progress danger';
@@ -572,6 +620,17 @@
     document.getElementById('editSendMoneyBtn').addEventListener('click', () => editBudget('Send Money', 'sendMoney'));
     document.getElementById('editPayBillsBtn').addEventListener('click', () => editBudget('Pay Bills', 'payBills'));
     document.getElementById('editAirtimeBtn').addEventListener('click', () => editBudget('Airtime/Data', 'airtime'));
+
+    // attach period selector handlers (save period preference)
+    document.getElementById('sendMoneyPeriod').addEventListener('change', (e) => {
+      if (!userBudgets) loadBudgets(); userBudgets['Send Money'].period = e.target.value; saveBudgets(); updateAnalytics();
+    });
+    document.getElementById('payBillsPeriod').addEventListener('change', (e) => {
+      if (!userBudgets) loadBudgets(); userBudgets['Pay Bills'].period = e.target.value; saveBudgets(); updateAnalytics();
+    });
+    document.getElementById('airtimePeriod').addEventListener('change', (e) => {
+      if (!userBudgets) loadBudgets(); userBudgets['Airtime/Data'].period = e.target.value; saveBudgets(); updateAnalytics();
+    });
 
     // Initial load
     updateAnalytics();
