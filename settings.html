@@ -189,9 +189,10 @@
       </div>
       <div class="setting-item">
         <div>
-          <div class="setting-label">Username</div>
-          <div class="setting-value" id="profileUser">Loading...</div>
+          <div class="setting-label">Nickname</div>
+          <div class="setting-value" id="profileNickname">Loading...</div>
         </div>
+        <button class="btn-small" id="editNicknameBtn">Edit</button>
       </div>
       <div class="setting-item">
         <div>
@@ -281,6 +282,20 @@
     </div>
   </div>
 
+  <!-- Modal for Edit Nickname -->
+  <div class="modal-overlay" id="editNicknameModal">
+    <div class="modal-content">
+      <h3>Edit Nickname</h3>
+      <input type="text" id="newNicknameInput" placeholder="Enter new nickname">
+      <div class="error-msg" id="nicknameError"></div>
+      <div class="success-msg" id="nicknameSuccess"></div>
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="closeModal('editNicknameModal')">Cancel</button>
+        <button class="btn-confirm" id="saveNicknameBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal for Change PIN -->
   <div class="modal-overlay" id="changePinModal">
     <div class="modal-content">
@@ -304,7 +319,10 @@
         const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
         if (cur) {
           document.getElementById('profileName').textContent = cur.name || 'N/A';
-          document.getElementById('profileUser').textContent = cur.user || 'N/A';
+          // show nickname if available, otherwise show username (user) or name
+          const nick = cur.nickname || cur.user || cur.name || 'N/A';
+          const nickEl = document.getElementById('profileNickname');
+          if (nickEl) nickEl.textContent = nick;
           document.getElementById('profileAccount').textContent = cur.accountNumber || 'N/A';
         }
       } catch(e) { console.error('Error loading profile:', e); }
@@ -364,6 +382,41 @@
     // Change PIN
     document.getElementById('changePinBtn').addEventListener('click', () => {
       openModal('changePinModal');
+    });
+
+    // Edit Nickname
+    const editNickBtn = document.getElementById('editNicknameBtn');
+    if (editNickBtn) {
+      editNickBtn.addEventListener('click', () => {
+        const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+        document.getElementById('newNicknameInput').value = cur ? (cur.nickname || '') : '';
+        openModal('editNicknameModal');
+      });
+    }
+
+    document.getElementById('saveNicknameBtn').addEventListener('click', () => {
+      const newNick = document.getElementById('newNicknameInput').value.trim();
+      const errorDiv = document.getElementById('nicknameError');
+      const successDiv = document.getElementById('nicknameSuccess');
+      errorDiv.textContent = '';
+      successDiv.textContent = '';
+
+      if (!newNick) {
+        errorDiv.textContent = 'Nickname cannot be empty';
+        return;
+      }
+      try {
+        const cur = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+        if (cur) {
+          cur.nickname = newNick;
+          localStorage.setItem('sb_current_user', JSON.stringify(cur));
+          const users = JSON.parse(localStorage.getItem('sb_users') || '[]');
+          const idx = users.findIndex(u => u.user === cur.user);
+          if (idx >= 0) { users[idx].nickname = newNick; localStorage.setItem('sb_users', JSON.stringify(users)); }
+          successDiv.textContent = 'Nickname updated successfully!';
+          setTimeout(() => { closeModal('editNicknameModal'); loadProfile(); }, 900);
+        }
+      } catch(e) { errorDiv.textContent = 'Error updating nickname'; }
     });
 
     document.getElementById('savePinBtn').addEventListener('click', () => {
