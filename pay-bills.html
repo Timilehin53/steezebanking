@@ -72,10 +72,10 @@
           </div>
         </div>
 
-        <div class="form-row" style="margin-top:0.75rem;" id="electricityRow" style="display:none;">
+        <div class="form-row" style="margin-top:0.75rem; display:none;" id="electricityRow">
           <div class="col">
-            <label for="biller">Select Electricity Company</label>
-            <select id="biller" required>
+            <label for="billerCompany">Select Electricity Company</label>
+            <select id="billerCompany" required>
               <option value="">Choose company</option>
               <option value="EKEDC">EKEDC (Electricity Distribution Company)</option>
               <option value="IKEDC">IKEDC (Ikeja Electric)</option>
@@ -87,14 +87,11 @@
           </div>
         </div>
 
-        <div class="form-row" style="margin-top:0.75rem;" id="otherBillerRow">
+        <div class="form-row" style="margin-top:0.75rem; display:none;" id="otherBillerRow">
           <div class="col">
-            <label for="biller">Select Biller</label>
-            <select id="biller" required>
-              <option value="">Choose biller</option>
-              <option value="water">Water Board</option>
-              <option value="internet">Internet Provider</option>
-              <option value="tv">TV Subscription</option>
+            <label for="billerProvider">Select Provider</label>
+            <select id="billerProvider" required>
+              <option value="">Choose provider</option>
             </select>
           </div>
         </div>
@@ -142,7 +139,8 @@
     const billerType = document.getElementById('billerType');
     const electricityRow = document.getElementById('electricityRow');
     const otherBillerRow = document.getElementById('otherBillerRow');
-    const billerSelect = document.getElementById('biller');
+    const billerCompany = document.getElementById('billerCompany');
+    const billerProvider = document.getElementById('billerProvider');
     const reviewBtn = document.getElementById('reviewBtn');
     const confirmModal = document.getElementById('confirmModal');
     const confirmBody = document.getElementById('confirmBody');
@@ -154,8 +152,7 @@
       if (e.target.value === 'electricity') {
         electricityRow.style.display = 'flex';
         otherBillerRow.style.display = 'none';
-        // Update biller select to show electricity companies
-        billerSelect.innerHTML = `
+        billerCompany.innerHTML = `
           <option value="">Choose company</option>
           <option value="EKEDC">EKEDC (Electricity Distribution Company)</option>
           <option value="IKEDC">IKEDC (Ikeja Electric)</option>
@@ -167,7 +164,7 @@
       } else if (e.target.value === 'water') {
         electricityRow.style.display = 'none';
         otherBillerRow.style.display = 'flex';
-        billerSelect.innerHTML = `
+        billerProvider.innerHTML = `
           <option value="">Choose biller</option>
           <option value="LASHMA">Lagos State Water Corporation</option>
           <option value="KWWC">Kano Water Works Company</option>
@@ -176,7 +173,7 @@
       } else if (e.target.value === 'internet') {
         electricityRow.style.display = 'none';
         otherBillerRow.style.display = 'flex';
-        billerSelect.innerHTML = `
+        billerProvider.innerHTML = `
           <option value="">Choose provider</option>
           <option value="SPECTRANET">Spectranet</option>
           <option value="SMILE">Smile Telecoms</option>
@@ -186,7 +183,7 @@
       } else if (e.target.value === 'tv') {
         electricityRow.style.display = 'none';
         otherBillerRow.style.display = 'flex';
-        billerSelect.innerHTML = `
+        billerProvider.innerHTML = `
           <option value="">Choose provider</option>
           <option value="DSTV-PADI">DStv - Padi</option>
           <option value="DSTV-YANGA">DStv - Yanga</option>
@@ -221,10 +218,17 @@
 
     reviewBtn.addEventListener('click', () => {
       // simple validation
-      const biller = document.getElementById('biller').value;
+      const billerTypeVal = document.getElementById('billerType').value;
+      let biller = '';
+      if (billerTypeVal === 'electricity') {
+        biller = document.getElementById('billerCompany').value;
+      } else if (billerTypeVal === 'water' || billerTypeVal === 'internet' || billerTypeVal === 'tv') {
+        biller = document.getElementById('billerProvider').value;
+      }
       const account = document.getElementById('account').value.trim();
       const amount = parseFloat(document.getElementById('amount').value);
       const errors = [];
+      if (!billerTypeVal) errors.push('Please choose a biller type.');
       if (!biller) errors.push('Please choose a biller.');
       if (!account) errors.push('Please enter the account or meter number.');
       if (!amount || amount <= 0) errors.push('Please enter a valid amount.');
